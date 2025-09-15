@@ -40,7 +40,7 @@ class TestConfig:
     })
     def test_config_default_values(self):
         """Testa valores padrão da configuração"""
-        assert Config.OPENROUTER_MODEL == "anthropic/claude-3.5-sonnet"
+        assert Config.OPENROUTER_MODEL == "deepseek/deepseek-chat-v3-0324"
         assert Config.TOP_K == 5
         assert Config.CHUNK_SIZE == 1500
         assert Config.MAX_TOKENS == 2000
