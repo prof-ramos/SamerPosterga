@@ -5,6 +5,7 @@ Este guia explica como fazer o deploy do bot usando Docker em diferentes ambient
 ## 📋 Pré-requisitos
 
 - Docker e Docker Compose instalados
+- Docker Buildx para builds multi-arquitetura
 - Arquivo `.env` configurado com as chaves necessárias
 - Pelo menos 2GB de espaço em disco disponível
 
@@ -42,6 +43,31 @@ docker-compose down
 # Parar e remover volumes
 docker-compose down -v
 ```
+
+## 🏗️ Build Multi-Arquitetura
+
+Para build em múltiplas plataformas (útil para deploy em diferentes servidores):
+
+```bash
+# Usar o script de build multi-arch
+./scripts/build-multiarch.sh v1.0.0
+
+# Ou build manual
+docker buildx build --platform linux/amd64,linux/arm64 -t juridic-bot:latest -f Dockerfile.optimized .
+```
+
+## 🐳 Deploy com Portainer
+
+Para fazer deploy usando Portainer:
+
+1. Crie os secrets necessários no Portainer:
+   - `discord_token`
+   - `openrouter_api_key`
+   - `openai_api_key`
+
+2. Faça upload do arquivo `deploy/portainer-stack.yml` como uma nova stack
+
+3. Deploy da stack através da interface do Portainer
 
 ## 🏗️ Build Multi-Arquitetura
 

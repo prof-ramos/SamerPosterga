@@ -42,8 +42,8 @@ uv run juridic-bot
 ### 🐳 Usando Docker
 
 ```bash
-# Build da imagem multi-arch
-docker build -t juridic-bot .
+# Build da imagem usando o Dockerfile otimizado
+docker-compose build
 
 # Execute com docker-compose
 docker-compose up -d
@@ -51,6 +51,24 @@ docker-compose up -d
 # Ou execute diretamente
 docker run -d --env-file .env juridic-bot
 ```
+
+### 🏗️ Build Multi-Arquitetura
+
+```bash
+# Usar o script de build multi-arch
+./scripts/build-multiarch.sh v1.0.0
+
+# Ou build manual com suporte a múltiplas arquiteturas
+docker buildx build --platform linux/amd64,linux/arm64 -t juridic-bot:latest -f Dockerfile.optimized .
+```
+
+### 🐳 Deploy com Portainer
+
+Para deploy em ambiente de produção usando Portainer:
+
+1. Crie os secrets necessários no Portainer
+2. Faça upload do arquivo `deploy/portainer-stack.yml` como uma nova stack
+3. Deploy da stack através da interface do Portainer
 
 ### 📦 Instalação Tradicional (pip)
 
