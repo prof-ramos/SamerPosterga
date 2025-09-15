@@ -1,14 +1,16 @@
-# 🤖 Bot Jurídico para Concursos
+# 🤖 Bot Jurídico Conversacional para Concursos
 
-Bot Discord com capacidades RAG (Retrieval-Augmented Generation) especializado em auxiliar estudantes de concursos públicos no Brasil com questões jurídicas.
+Assistente jurídico inteligente e amigável para estudantes de concursos públicos no Brasil. Funciona como um chatbot conversacional que responde naturalmente às suas dúvidas sobre direito.
 
 ## ✨ Características
 
-- **RAG Avançado**: Busca inteligente em documentos jurídicos usando embeddings
-- **Especialização Jurídica**: Conhecimento abrangente das principais áreas do Direito para concursos públicos
-- **Integração Discord**: Interface intuitiva via comandos slash e menções
-- **Múltiplos Formatos**: Suporte a PDF, TXT, Markdown e DOCX
-- **OpenRouter + OpenAI**: Modelos de linguagem avançados para respostas precisas
+- **🤖 Chatbot Conversacional**: Interação natural via @menção ou DM, sem comandos complicados
+- **🧠 RAG Inteligente**: Busca contextual em documentos jurídicos usando embeddings OpenAI
+- **📚 Especialização Jurídica**: Foco nas principais áreas do Direito brasileiro para concursos
+- **🎯 Respostas Didáticas**: Explicações claras e progressivas, como um professor experiente
+- **⚡ Resposta Rápida**: Interface fluida sem barreiras técnicas
+- **📄 Múltiplos Formatos**: Suporte a PDF, TXT, Markdown e DOCX
+- **🔧 OpenRouter + OpenAI**: Modelos avançados (DeepSeek + embeddings) para respostas precisas
 
 ## 🚀 Instalação
 
@@ -19,45 +21,61 @@ Bot Discord com capacidades RAG (Retrieval-Augmented Generation) especializado e
 - OpenRouter API Key
 - OpenAI API Key
 
-### Instalação Rápida
+### 🚀 Instalação Rápida com UV
 
 ```bash
 # Clone o repositório
-git clone <repository-url>
-cd juridic-concursos-bot
+git clone https://github.com/prof-ramos/SamerPosterga.git
+cd SamerPosterga
 
-# Instale as dependências
-pip install -r requirements.txt
+# Instale as dependências com UV (recomendado)
+uv sync
 
 # Configure as variáveis de ambiente
 cp .env.example .env
 # Edite o .env com suas chaves API
+
+# Execute o bot
+uv run juridic-bot
 ```
 
-### Usando Docker
+### 🐳 Usando Docker
 
 ```bash
-# Build da imagem
+# Build da imagem multi-arch
 docker build -t juridic-bot .
 
-# Execute o container
+# Execute com docker-compose
 docker-compose up -d
+
+# Ou execute diretamente
+docker run -d --env-file .env juridic-bot
+```
+
+### 📦 Instalação Tradicional (pip)
+
+```bash
+# Instale as dependências
+pip install -r requirements.txt
+
+# Execute o bot
+python -m src.juridic_bot.main
 ```
 
 ## ⚙️ Configuração
 
-### Arquivo .env
+### 📝 Arquivo .env
 
 ```env
 # Discord Config
 DISCORD_TOKEN=seu_token_aqui
 DISCORD_APP_ID=seu_app_id_aqui
-DISCORD_GUILD_ID=opcional_guild_id
+DISCORD_GUILD_ID=  # Deixe vazio para modo global
 DISCORD_OWNER_ID=seu_user_id_para_comandos_admin
 
-# OpenRouter Config
+# OpenRouter Config (LLM principal)
 OPENROUTER_API_KEY=seu_openrouter_key
-OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
 
 # OpenAI Config (para embeddings)
@@ -75,6 +93,14 @@ TEMPERATURE=0.7
 LOG_LEVEL=INFO
 ```
 
+### 🎯 Modo Conversacional
+
+O bot está configurado para **modo conversacional**:
+- ✅ **Sem comandos slash** - interação natural
+- ✅ **Respostas amigáveis** - tom de professor
+- ✅ **Sem disclaimers** - conversa fluida
+- ✅ **Tratamento de erros** inteligente
+
 ### Documentos
 
 Coloque seus documentos na pasta `knowledge/`:
@@ -87,56 +113,140 @@ Coloque seus documentos na pasta `knowledge/`:
   - etc.
 - Suportados: `.pdf`, `.txt`, `.md`, `.docx`
 
-## 🎯 Uso
+## 🎯 Como Usar
 
-### Comandos Disponíveis
+### 🤖 Modo Conversacional
 
-| Comando | Descrição |
-|---------|-----------|
-| `/ping` | Verifica latência do bot |
-| `/status` | Mostra status do sistema |
-| `/reindex` | Reindexa documentos (apenas owner) |
-| `/buscar_lei` | Busca lei específica |
-| `/ajuda` | Menu de ajuda |
+O bot funciona como um **chatbot amigável** - apenas mencione-o ou envie DM!
 
-### Interação por Menção
-
-Mencione o bot (@Bot) seguido de sua pergunta:
-
+#### 📱 Via Menção no Servidor
 ```
-@Bot Qual é a legislação sobre férias de oficiais de chancelaria?
+@SamerPosterga Qual é a diferença entre habeas corpus e habeas data?
 ```
 
-### Respostas Estruturadas
+#### 💬 Via Mensagem Direta (DM)
+```
+Oi! Me explica o que é improbidade administrativa?
+```
 
-O bot fornece:
-- Respostas baseadas em documentos indexados
-- Citação de fontes consultadas
-- Disclaimer legal
-- Contexto jurídico específico do Serviço Exterior
+#### 🎓 Exemplos de Perguntas
+- "O que é devido processo legal?"
+- "Como funciona a prescrição penal?"
+- "Qual a diferença entre mandado de segurança e ação popular?"
+- "Me explica sobre responsabilidade civil do Estado"
+
+### 💡 Características das Respostas
+
+- **📖 Explicações Didáticas**: Conceitos explicados passo a passo
+- **📚 Baseadas em Documentos**: Respostas fundamentadas em legislação
+- **🎯 Foco em Concursos**: Conteúdo relevante para provas
+- **😊 Tom Amigável**: Como conversar com um professor experiente
+- **⚡ Respostas Rápidas**: Sem complicações técnicas
+
+### 🔧 Comandos Técnicos (Opcional)
+
+Para usuários avançados, alguns comandos ainda estão disponíveis:
+- `/ping` - Verifica se o bot está respondendo
+- `/status` - Mostra informações do sistema
+- `/reindex` - Reindexa documentos (apenas admin)
 
 ## 🏗️ Arquitetura
 
 ```
 src/juridic_bot/
-├── config.py          # Configurações centralizadas
-├── main.py           # Ponto de entrada
-├── bot/              # Módulo Discord
+├── config.py          # ⚙️ Configurações centralizadas
+├── main.py           # 🚀 Ponto de entrada
+├── bot/              # 🤖 Módulo Discord (modo conversacional)
 │   ├── __init__.py
-│   └── bot.py
-├── rag/              # Sistema RAG
+│   └── bot.py        # 💬 Lógica de chat e menções
+├── rag/              # 🧠 Sistema RAG inteligente
 │   ├── __init__.py
-│   ├── embeddings.py # Serviço de embeddings
-│   ├── ingest.py     # Processamento de documentos
-│   └── retriever.py  # Busca e recuperação
-└── llm/              # Cliente LLM
+│   ├── embeddings.py # 🔍 Serviço de embeddings OpenAI
+│   ├── ingest.py     # 📄 Processamento de documentos
+│   └── retriever.py  # 🎯 Busca e recuperação contextual
+└── llm/              # 🤖 Cliente LLM conversacional
     ├── __init__.py
-    └── client.py
+    └── client.py     # 💭 Respostas naturais via OpenRouter
+
+knowledge/            # 📚 Base de conhecimento jurídica
+├── direito_constitucional/
+├── direito_administrativo/
+├── direito_penal/
+├── direito_civil/
+└── direito_processual/
+```
+
+### 🎭 Modo Conversacional
+
+O bot opera em **modo conversacional inteligente**:
+
+1. **👂 Escuta**: Monitora menções (@bot) e DMs
+2. **🧠 Processa**: Usa RAG para buscar contexto relevante
+3. **💭 Responde**: Gera respostas naturais e didáticas
+4. **😊 Interage**: Mantém conversa fluida e amigável
+
+**Vantagens:**
+- ✅ Interação natural como conversar com um professor
+- ✅ Sem barreiras técnicas (comandos, sintaxes)
+- ✅ Respostas contextualizadas com a legislação
+- ✅ Tratamento inteligente de dúvidas fora do escopo
+
+## 💬 Exemplos de Uso
+
+### 📚 Perguntas Educacionais
+```
+Usuário: @SamerPosterga O que é devido processo legal?
+
+Bot: Olá! O devido processo legal é um princípio fundamental do direito constitucional brasileiro. Ele está previsto no art. 5º, LIV, da Constituição Federal:
+
+"ninguém será privado da liberdade ou de seus bens sem o devido processo legal"
+
+Na prática, isso significa que qualquer atuação do Estado que afete direitos individuais deve seguir um procedimento adequado, com contraditório e ampla defesa. É uma garantia contra arbitrariedades do poder público!
+
+Quer que eu explique algum aspecto específico sobre isso? 🤔
+```
+
+### ⚖️ Consultas Jurídicas
+```
+Usuário: Me explica a diferença entre mandado de segurança e habeas corpus
+
+Bot: Claro! Vamos lá:
+
+**Habeas Corpus** (art. 5º, LXVIII, CF):
+- Protege a liberdade de locomoção
+- Usado contra prisão ou ameaça de prisão ilegal
+- Prazo: 24 horas para impetração
+
+**Mandado de Segurança** (art. 5º, LXIX, CF):
+- Protege qualquer direito líquido e certo
+- Mais amplo: pode ser contra atos de autoridade em geral
+- Prazo: 120 dias para impetração
+
+O HC é específico para liberdade, enquanto o MS vale para outros direitos. Ambos são ações constitucionais de proteção individual! 📖
 ```
 
 ## 🧪 Desenvolvimento
 
-### Configuração do Ambiente de Desenvolvimento
+### 🛠️ Configuração com UV (Recomendado)
+
+```bash
+# Instale dependências incluindo dev
+uv sync --dev
+
+# Execute os testes
+uv run pytest
+
+# Verifique qualidade do código
+uv run flake8 src/
+uv run mypy src/
+uv run black src/
+uv run isort src/
+
+# Execute o bot em modo desenvolvimento
+uv run juridic-bot
+```
+
+### 📦 Desenvolvimento Tradicional
 
 ```bash
 # Instale dependências de desenvolvimento
@@ -205,14 +315,41 @@ Os logs são salvos em `logs/bot.log` com diferentes níveis:
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
-## 📞 Suporte
+## 📞 Suporte e Comunidade
 
-Para suporte técnico ou dúvidas sobre o projeto:
+### 🆘 Precisa de Ajuda?
+- 📧 **Email**: suporte@juridic-bot.com
+- 🐛 **Issues**: [GitHub Issues](https://github.com/prof-ramos/SamerPosterga/issues)
+- 📖 **Documentação**: [Wiki do Projeto](https://github.com/prof-ramos/SamerPosterga/wiki)
+- 💬 **Discord**: Junte-se ao nosso servidor para discussões sobre direito e concursos
 
-- 📧 Email: suporte@juridic-bot.com
-- 🐛 Issues: [GitHub Issues](https://github.com/juridic-bot/concursos-bot/issues)
-- 📖 Documentação: [Wiki](https://github.com/juridic-bot/concursos-bot/wiki)
+### 🤝 Como Contribuir
+
+1. **Fork** o projeto
+2. **Adicione documentos** na pasta `knowledge/`
+3. **Teste** com suas dúvidas de concurso
+4. **Abra uma Issue** com sugestões ou problemas
+5. **Envie um PR** com melhorias
+
+### 📊 Status do Projeto
+
+- ✅ **Modo Conversacional**: Ativo e funcional
+- ✅ **RAG System**: ChromaDB + OpenAI embeddings
+- ✅ **LLM Integration**: OpenRouter (DeepSeek)
+- ✅ **Documentos**: Constituição Federal incluída
+- ✅ **Docker**: Multi-arch support
+- ✅ **UV Package Manager**: Configurado
+
+### 🎯 Roadmap
+
+- [ ] Adicionar mais documentos jurídicos
+- [ ] Implementar sistema de feedback das respostas
+- [ ] Suporte a múltiplos idiomas
+- [ ] Interface web para administração
+- [ ] Integração com bases de jurisprudência
 
 ---
 
-⭐ **Star este repositório** se o projeto foi útil para você!
+**⭐ Star este repositório** se está ajudando nos seus estudos para concursos! 📚✨
+
+**Desenvolvido com ❤️ para estudantes de direito no Brasil** 🇧🇷
