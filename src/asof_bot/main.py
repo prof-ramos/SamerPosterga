@@ -1,5 +1,5 @@
 """
-Ponto de entrada principal do Bot Jurídico ASOF
+Ponto de entrada principal do Bot Jurídico para Concursos
 """
 import asyncio
 import logging

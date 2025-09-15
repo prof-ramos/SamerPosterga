@@ -3,11 +3,11 @@ version: '3.8'
 services:
   bot:
     build: .
-    container_name: asof-juridic-bot
+    container_name: juridic-concursos-bot
     env_file: .env
     volumes:
-      - ./data/RRAG:/app/data/RRAG
-      - ./data/chroma:/app/data/chroma
+      - ./knowledge:/app/knowledge
+      - ./.chroma:/app/.chroma
       - ./logs:/app/logs
     restart: unless-stopped
     deploy:

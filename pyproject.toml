@@ -3,11 +3,11 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "asof-juridic-bot"
+name = "juridic-concursos-bot"
 version = "1.0.0"
-description = "Bot Discord com capacidades RAG para questões jurídicas"
+description = "Bot Discord com capacidades RAG para auxiliar estudantes de concursos jurídicos"
 authors = [
-    {name = "Gabriel Ramos", email = "gabriel@asof.org.br"}
+    {name = "Gabriel Ramos", email = "gabriel@example.com"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
@@ -54,7 +54,7 @@ docs = [
 ]
 
 [project.scripts]
-asof-bot = "src.asof_bot.main:main"
+juridic-bot = "src.asof_bot.main:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

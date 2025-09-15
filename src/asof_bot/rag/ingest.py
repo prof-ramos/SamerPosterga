@@ -66,19 +66,38 @@ class DocumentProcessor:
 
     def enrich_metadata(self, doc: Document, file_path: Path) -> Document:
         """Adiciona metadados aos documentos"""
+        # Identificar área do direito baseada no caminho do arquivo
+        area_direito = self.identificar_area_direito(file_path)
+
         doc.metadata.update({
             "source": file_path.name,
             "tipo_documento": self.identificar_tipo_documento(doc.page_content),
+            "area_direito": area_direito,
             "data_indexacao": datetime.now().isoformat(),
             "hash_documento": hashlib.md5(doc.page_content.encode()).hexdigest()[:8],
             "caminho_completo": str(file_path)
         })
 
-        # Detectar contexto ASOF/Serviço Exterior
-        if self.is_documento_servico_exterior(doc.page_content):
-            doc.metadata["contexto"] = "servico_exterior"
-
         return doc
+
+    def identificar_area_direito(self, file_path: Path) -> str:
+        """Identifica a área do direito baseada no caminho do arquivo"""
+        path_parts = file_path.parts
+
+        # Procurar por pastas de área do direito
+        areas_conhecidas = [
+            "direito_administrativo", "direito_constitucional", "direito_penal",
+            "direito_civil", "direito_processual", "direito_tributario",
+            "direito_trabalhista", "direito_previdenciario", "direito_eleitoral",
+            "direito_internacional", "direito_ambiental", "direito_consumidor"
+        ]
+
+        for part in path_parts:
+            for area in areas_conhecidas:
+                if area in part.lower():
+                    return area.replace("direito_", "").replace("_", " ").title()
+
+        return "Direito Geral"
 
     def identificar_tipo_documento(self, content: str) -> str:
         """Identifica o tipo de documento jurídico"""
@@ -94,42 +113,84 @@ class DocumentProcessor:
             return "resolucao"
         elif "instrução normativa" in content_lower:
             return "instrucao_normativa"
-        elif "oficial de chancelaria" in content_lower or "serviço exterior" in content_lower:
-            return "documento_servico_exterior"
+        elif "súmula" in content_lower:
+            return "sumula"
+        elif "jurisprudência" in content_lower or "julgado" in content_lower:
+            return "jurisprudencia"
+        elif "doutrina" in content_lower:
+            return "doutrina"
         else:
             return "documento_geral"
 
-    def is_documento_servico_exterior(self, content: str) -> bool:
-        """Verifica se é documento relacionado ao Serviço Exterior"""
-        termos = [
-            "oficial de chancelaria",
-            "serviço exterior brasileiro",
-            "MRE", "Itamaraty",
-            "ASOF"
-        ]
-        content_lower = content.lower()
-        return any(termo.lower() in content_lower for termo in termos)
+    def get_processed_files_hash(self) -> set:
+        """Retorna um set com os hashes dos arquivos já processados"""
+        processed_hashes = set()
+
+        # Verificar se existe vectorstore
+        if not Config.CHROMA_DIR.exists():
+            return processed_hashes
+
+        try:
+            # Tentar carregar o vectorstore existente
+            vectorstore = Chroma(
+                persist_directory=str(Config.CHROMA_DIR),
+                embedding_function=self.embedding_service.get_langchain_embeddings()
+            )
+
+            # Obter todos os documentos e seus metadados
+            results = vectorstore.get()
+            for metadata in results['metadatas']:
+                if metadata and 'hash_documento' in metadata:
+                    processed_hashes.add(metadata['hash_documento'])
+
+        except Exception as e:
+            logger.warning(f"Erro ao carregar vectorstore existente: {e}")
+
+        return processed_hashes
 
     def process_all_documents(self) -> List[Document]:
-        """Processa todos os documentos do diretório"""
+        """Processa todos os documentos do diretório, pulando os já processados"""
         all_documents = []
 
         if not Config.DOCUMENTS_DIR.exists():
             logger.warning(f"Diretório {Config.DOCUMENTS_DIR} não existe")
             return all_documents
 
+        # Obter hashes dos arquivos já processados
+        processed_hashes = self.get_processed_files_hash()
+
         # Extensões suportadas
         extensions = ['.pdf', '.txt', '.md', '.docx', '.doc']
-        files = [f for f in Config.DOCUMENTS_DIR.iterdir()
-                if f.is_file() and f.suffix.lower() in extensions]
 
-        logger.info(f"Encontrados {len(files)} documentos para processar")
+        # Coletar todos os arquivos recursivamente (incluindo subpastas)
+        all_files = []
+        for ext in extensions:
+            all_files.extend(list(Config.DOCUMENTS_DIR.rglob(f'*{ext}')))
 
-        for file_path in files:
+        logger.info(f"Encontrados {len(all_files)} documentos no diretório")
+
+        # Filtrar arquivos não processados
+        new_files = []
+        for file_path in all_files:
+            # Calcular hash do arquivo baseado no caminho e tamanho
+            file_hash = hashlib.md5(f"{file_path}:{file_path.stat().st_size}".encode()).hexdigest()[:8]
+
+            if file_hash not in processed_hashes:
+                new_files.append((file_path, file_hash))
+            else:
+                logger.info(f"Pulando arquivo já processado: {file_path.name}")
+
+        logger.info(f"{len(new_files)} arquivos novos para processar")
+
+        for file_path, file_hash in new_files:
             docs = self.load_document(file_path)
 
             # Enriquecer metadados
             docs = [self.enrich_metadata(doc, file_path) for doc in docs]
+
+            # Adicionar hash do arquivo aos metadados
+            for doc in docs:
+                doc.metadata["file_hash"] = file_hash
 
             # Dividir em chunks
             chunks = self.text_splitter.split_documents(docs)

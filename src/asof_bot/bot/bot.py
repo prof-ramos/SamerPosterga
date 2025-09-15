@@ -61,7 +61,7 @@ class JuridicBot(commands.Bot):
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.listening,
-                name="questões jurídicas | @mention"
+                name="dúvidas de concurso | @mention"
             )
         )
 
@@ -236,8 +236,8 @@ async def buscar_lei(interaction: discord.Interaction, numero: str, ano: str = N
 async def ajuda(interaction: discord.Interaction):
     """Mostra informações de ajuda"""
     embed = discord.Embed(
-        title="🤖 Bot Jurídico ASOF - Ajuda",
-        description="Assistente especializado em questões jurídicas e administrativas",
+        title="🤖 Bot Jurídico para Concursos - Ajuda",
+        description="Assistente especializado em questões jurídicas para estudantes de concursos públicos",
         color=discord.Color.blue()
     )
 
@@ -255,10 +255,10 @@ async def ajuda(interaction: discord.Interaction):
 
     embed.add_field(
         name="Especialidades",
-        value="• Serviço Exterior Brasileiro\n• Legislação administrativa\n• Normativas MRE/ASOF",
+        value="• Direito Constitucional\n• Direito Administrativo\n• Direito Penal\n• Direito Civil\n• Direito Processual\n• E muito mais!",
         inline=False
     )
 
-    embed.set_footer(text="ASOF - Associação Nacional dos Oficiais de Chancelaria")
+    embed.set_footer(text="Bot desenvolvido para auxiliar estudantes de concursos públicos")
 
     await interaction.response.send_message(embed=embed)

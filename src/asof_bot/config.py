@@ -1,5 +1,5 @@
 """
-Configuração do Bot Jurídico ASOF
+Configuração do Bot Jurídico para Concursos
 """
 import os
 from pathlib import Path
@@ -33,8 +33,8 @@ class Config:
 
     # Paths
     BASE_DIR = Path(__file__).parent.parent.parent
-    DOCUMENTS_DIR = BASE_DIR / "data" / "RRAG"
-    CHROMA_DIR = BASE_DIR / "data" / "chroma"
+    DOCUMENTS_DIR = BASE_DIR / "knowledge"
+    CHROMA_DIR = BASE_DIR / ".chroma"
     LOGS_DIR = BASE_DIR / "logs"
 
     # System

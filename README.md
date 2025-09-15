@@ -1,11 +1,11 @@
-# 🤖 Bot Jurídico ASOF
+# 🤖 Bot Jurídico para Concursos
 
-Bot Discord com capacidades RAG (Retrieval-Augmented Generation) especializado em questões jurídicas e administrativas do Brasil, com foco no Serviço Exterior Brasileiro.
+Bot Discord com capacidades RAG (Retrieval-Augmented Generation) especializado em auxiliar estudantes de concursos públicos no Brasil com questões jurídicas.
 
 ## ✨ Características
 
 - **RAG Avançado**: Busca inteligente em documentos jurídicos usando embeddings
-- **Especialização Jurídica**: Conhecimento específico do Serviço Exterior Brasileiro (ASOF)
+- **Especialização Jurídica**: Conhecimento abrangente das principais áreas do Direito para concursos públicos
 - **Integração Discord**: Interface intuitiva via comandos slash e menções
 - **Múltiplos Formatos**: Suporte a PDF, TXT, Markdown e DOCX
 - **OpenRouter + OpenAI**: Modelos de linguagem avançados para respostas precisas
@@ -24,7 +24,7 @@ Bot Discord com capacidades RAG (Retrieval-Augmented Generation) especializado e
 ```bash
 # Clone o repositório
 git clone <repository-url>
-cd asof-juridic-bot
+cd juridic-concursos-bot
 
 # Instale as dependências
 pip install -r requirements.txt
@@ -38,7 +38,7 @@ cp .env.example .env
 
 ```bash
 # Build da imagem
-docker build -t asof-bot .
+docker build -t juridic-bot .
 
 # Execute o container
 docker-compose up -d
@@ -77,8 +77,14 @@ LOG_LEVEL=INFO
 
 ### Documentos
 
-Coloque seus documentos na pasta `data/RRAG/`:
-- `data/RRAG/` - Documentos para indexação RAG
+Coloque seus documentos na pasta `knowledge/`:
+- `knowledge/` - Documentos para indexação RAG
+- Organize em subpastas por área do direito:
+  - `knowledge/direito_constitucional/`
+  - `knowledge/direito_administrativo/`
+  - `knowledge/direito_penal/`
+  - `knowledge/direito_civil/`
+  - etc.
 - Suportados: `.pdf`, `.txt`, `.md`, `.docx`
 
 ## 🎯 Uso
@@ -199,17 +205,13 @@ Os logs são salvos em `logs/bot.log` com diferentes níveis:
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
-## 👥 Sobre a ASOF
-
-A **Associação Nacional dos Oficiais de Chancelaria (ASOF)** representa os servidores públicos que atuam no Serviço Exterior Brasileiro, contribuindo para a diplomacia e representação internacional do Brasil.
-
 ## 📞 Suporte
 
 Para suporte técnico ou dúvidas sobre o projeto:
 
-- 📧 Email: suporte@asof.org.br
-- 🐛 Issues: [GitHub Issues](https://github.com/asof-brasil/asof-juridic-bot/issues)
-- 📖 Documentação: [Wiki](https://github.com/asof-brasil/asof-juridic-bot/wiki)
+- 📧 Email: suporte@juridic-bot.com
+- 🐛 Issues: [GitHub Issues](https://github.com/juridic-bot/concursos-bot/issues)
+- 📖 Documentação: [Wiki](https://github.com/juridic-bot/concursos-bot/wiki)
 
 ---
 

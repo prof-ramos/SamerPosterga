@@ -16,7 +16,7 @@ COPY src/ ./src/
 COPY pyproject.toml .
 
 # Criar diretórios necessários
-RUN mkdir -p data/RRAG data/chroma logs
+RUN mkdir -p knowledge .chroma logs
 
 # Comando para executar
 CMD ["python", "-m", "src.asof_bot.main"]
