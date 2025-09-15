@@ -118,7 +118,7 @@ O bot fornece:
 ## 🏗️ Arquitetura
 
 ```
-src/asof_bot/
+src/juridic_bot/
 ├── config.py          # Configurações centralizadas
 ├── main.py           # Ponto de entrada
 ├── bot/              # Módulo Discord

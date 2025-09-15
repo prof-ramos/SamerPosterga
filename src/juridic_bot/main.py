@@ -19,7 +19,7 @@ async def main():
 
         # Verificar se há documentos indexados
         if not Config.CHROMA_DIR.exists():
-            logger.warning("Vectorstore não existe. Execute 'python -m src.asof_bot.main' primeiro!")
+            logger.warning("Vectorstore não existe. Execute 'python -m src.juridic_bot.main' primeiro!")
             processor = DocumentProcessor()
             processor.create_vectorstore()
 

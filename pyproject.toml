@@ -54,7 +54,7 @@ docs = [
 ]
 
 [project.scripts]
-juridic-bot = "src.asof_bot.main:main"
+juridic-bot = "src.juridic_bot.main:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

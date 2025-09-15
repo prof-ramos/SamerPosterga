@@ -38,4 +38,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 EXPOSE 8080
 
 # Command to run
-CMD ["python", "-m", "src.asof_bot.main"]
+CMD ["python", "-m", "src.juridic_bot.main"]

@@ -3,7 +3,7 @@ Testes para o módulo de configuração
 """
 import pytest
 from unittest.mock import patch
-from src.asof_bot.config import Config
+from src.juridic_bot.config import Config
 
 
 class TestConfig:

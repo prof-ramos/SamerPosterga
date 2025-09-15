@@ -1,7 +1,7 @@
 """
 Discord Bot com RAG (Retrieval-Augmented Generation)
 Sistema completo com OpenAI embeddings e OpenRouter para geração
-Autor: Gabriel Ramos - ASOF
+Autor: Gabriel Ramos
 """
 
 # ========================
@@ -221,7 +221,7 @@ class DocumentProcessor:
             "caminho_completo": str(file_path)
         })
         
-        # Detectar contexto ASOF/Serviço Exterior
+        # Detectar contexto jurídico
         if self.is_documento_servico_exterior(doc.page_content):
             doc.metadata["contexto"] = "servico_exterior"
         
@@ -251,8 +251,7 @@ class DocumentProcessor:
         termos = [
             "oficial de chancelaria",
             "serviço exterior brasileiro",
-            "MRE", "Itamaraty",
-            "ASOF"
+            "MRE", "Itamaraty"
         ]
         content_lower = content.lower()
         return any(termo.lower() in content_lower for termo in termos)
@@ -456,8 +455,8 @@ Quando responder:
                 temperature=temperature or Config.TEMPERATURE,
                 # Headers recomendados pelo OpenRouter
                 extra_headers={
-                    "HTTP-Referer": "https://github.com/asof-brasil",
-                    "X-Title": "ASOF Bot Jurídico"
+                    "HTTP-Referer": "https://github.com/juridic-bot",
+                    "X-Title": "Bot Jurídico para Concursos"
                 }
             )
             
@@ -718,7 +717,7 @@ async def buscar_lei(interaction: discord.Interaction, numero: str, ano: str = N
 async def ajuda(interaction: discord.Interaction):
     """Mostra informações de ajuda"""
     embed = discord.Embed(
-        title="🤖 Bot Jurídico ASOF - Ajuda",
+        title="🤖 Bot Jurídico para Concursos - Ajuda",
         description="Assistente especializado em questões jurídicas e administrativas",
         color=discord.Color.blue()
     )
@@ -737,11 +736,11 @@ async def ajuda(interaction: discord.Interaction):
     
     embed.add_field(
         name="Especialidades",
-        value="• Serviço Exterior Brasileiro\n• Legislação administrativa\n• Normativas MRE/ASOF",
+        value="• Direito Constitucional\n• Direito Administrativo\n• Direito Penal\n• Direito Civil\n• Direito Processual",
         inline=False
     )
     
-    embed.set_footer(text="ASOF - Associação Nacional dos Oficiais de Chancelaria")
+    embed.set_footer(text="Bot Jurídico para Concursos - Assistente de Estudos")
     
     await interaction.response.send_message(embed=embed)
 
@@ -783,7 +782,7 @@ version: '3.8'
 services:
   bot:
     build: .
-    container_name: asof-juridic-bot
+    container_name: juridic-concursos-bot
     env_file: .env
     volumes:
       - ./RRAG:/app/RRAG
