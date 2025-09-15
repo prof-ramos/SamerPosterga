@@ -1,4 +1,4 @@
-# 🤖 Bot Jurídico Conversacional para Concursos
+# 🤖 Bot Discord Jurídico Conversacional para Concursos
 
 Assistente jurídico inteligente e amigável para estudantes de concursos públicos no Brasil. Funciona como um chatbot conversacional que responde naturalmente às suas dúvidas sobre direito.
 
