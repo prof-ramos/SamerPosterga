@@ -827,4 +827,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar código
 COPY . .
 
-#
+# Comando para executar
+CMD ["python", "discord-rag-bot-complete.py"]
+"""

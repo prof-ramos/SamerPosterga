@@ -1,27 +1,43 @@
 version: '3.8'
 
 services:
-  bot:
-    build: .
+  juridic-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - linux/amd64
+        - linux/arm64
     container_name: juridic-concursos-bot
-    env_file: .env
-    volumes:
-      - ./knowledge:/app/knowledge
-      - ./.chroma:/app/.chroma
-      - ./logs:/app/logs
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-        reservations:
-          memory: 1G
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - VECTOR_DB_PATH=/app/.chroma
+      - KNOWLEDGE_PATH=/app/knowledge
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./knowledge:/app/knowledge:rw
+      - ./.chroma:/app/.chroma:rw
+      - ./logs:/app/logs:rw
+    networks:
+      - juridic-network
     healthcheck:
-      test: ["CMD", "python", "-c", "import psutil; exit(0 if psutil.cpu_percent() < 90 else 1)"]
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
+
+networks:
+  juridic-network:
+    driver: bridge
 
 volumes:
-  chroma_data:
+  knowledge:
+    driver: local
+  chroma:
+    driver: local
   logs:
+    driver: local
