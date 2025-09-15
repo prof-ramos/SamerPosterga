@@ -127,13 +127,22 @@ class JuridicBot(commands.Bot):
 
             except Exception as e:
                 logger.error(f"Erro ao processar query: {e}")
-                # Resposta de erro mais amigável
-                error_responses = [
-                    "Desculpe, tive um probleminha técnico. Pode tentar perguntar de novo?",
-                    "Ops! Algo deu errado. Tente reformular sua pergunta, por favor!",
-                    "Hmm, parece que houve um erro. Que tal tentar novamente?"
-                ]
-                await message.reply(error_responses[hash(str(e)) % len(error_responses)])
+                # Resposta de erro mais amigável e específica
+                if "rate limit" in str(e).lower():
+                    error_msg = "Ops! Estou um pouco sobrecarregado agora. Pode tentar novamente em alguns minutos? ⏳"
+                elif "timeout" in str(e).lower():
+                    error_msg = "Hmm, a resposta está demorando um pouco. Que tal tentar uma pergunta mais simples? 🕐"
+                elif "embedding" in str(e).lower():
+                    error_msg = "Tive um probleminha com a busca de informações. Pode reformular a pergunta? 🔍"
+                else:
+                    error_responses = [
+                        "Desculpe, tive um probleminha técnico. Pode tentar perguntar de novo? 🔧",
+                        "Ops! Algo deu errado. Tente reformular sua pergunta, por favor! 😅",
+                        "Hmm, parece que houve um erro. Que tal tentar novamente? 🤔"
+                    ]
+                    error_msg = error_responses[hash(str(e)) % len(error_responses)]
+
+                await message.reply(error_msg)
 
     async def send_long_message(self, message: discord.Message, content: str):
         """Envia mensagens longas divididas em chunks"""
@@ -247,9 +256,6 @@ async def pergunta(interaction: discord.Interaction, pergunta: str):
         # Gerar resposta usando LLM
         response = bot.llm_client.generate(pergunta, context)
 
-        # Adicionar disclaimer
-        response = bot.llm_client.add_disclaimer(response)
-
         # Adicionar fontes citadas
         if documents:
             sources = list(set(doc.metadata.get('source', 'N/A') for doc in documents))
@@ -267,12 +273,12 @@ async def pergunta(interaction: discord.Interaction, pergunta: str):
 
 
 @bot.tree.command(name="buscar_lei")
-async def buscar_lei(interaction: discord.Interaction, numero: str, ano: str = None):
+async def buscar_lei(interaction: discord.Interaction, numero: str, ano: str = ""):
     """Busca uma lei específica"""
     await interaction.response.defer()
 
     query = f"Lei {numero}"
-    if ano:
+    if ano and ano.strip():
         query += f"/{ano}"
 
     try:
