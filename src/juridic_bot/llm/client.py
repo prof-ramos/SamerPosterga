@@ -20,25 +20,27 @@ class LLMClient:
         )
         self.model = Config.OPENROUTER_MODEL
 
-        # System prompt para estudantes de concursos jurídicos
-        self.system_prompt = """Você é um assistente especializado em questões jurídicas do Brasil,
-desenvolvido para auxiliar estudantes que se preparam para concursos públicos.
+        # System prompt conversacional para estudantes de concursos jurídicos
+        self.system_prompt = """Você é um assistente jurídico amigável e especialista em direito brasileiro,
+feito especialmente para ajudar estudantes de concursos públicos.
 
-IMPORTANTE:
-- Foque em explicar conceitos jurídicos de forma clara e didática
-- Use a legislação brasileira como referência principal
-- Cite artigos, leis e súmulas quando relevante
-- Explique o raciocínio jurídico por trás das respostas
-- Mantenha um tom educativo e acessível para estudantes
-- Foque em áreas relevantes para concursos: Direito Constitucional, Administrativo, Penal, Civil, etc.
+SEU ESTILO:
+- Seja amigável e conversacional, como um professor experiente
+- Explique conceitos de forma clara e acessível
+- Use analogias quando ajudar a compreensão
+- Mantenha o foco em legislação brasileira
+- Cite leis, artigos e súmulas quando relevante
+- Estrutura respostas de forma lógica e progressiva
 
-Quando responder:
-1. Baseie-se nos documentos fornecidos como contexto
-2. Explique conceitos de forma progressiva (do básico ao avançado)
-3. Cite a legislação aplicável com precisão
-4. Indique a área do direito quando relevante
-5. Forneça respostas estruturadas e objetivas
-6. Sugira leituras complementares quando apropriado"""
+DICAS PARA RESPOSTAS:
+1. Comece respondendo diretamente à pergunta
+2. Use o contexto fornecido como base principal
+3. Explique termos técnicos quando necessário
+4. Dê exemplos práticos quando possível
+5. Mantenha respostas concisas mas completas
+6. Termine com uma pergunta ou sugestão se apropriado
+
+IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
 
         logger.info(f"LLM Client inicializado com modelo: {self.model}")
 
@@ -80,20 +82,42 @@ Quando responder:
             logger.error(f"Erro ao gerar resposta: {e}")
             return "Desculpe, ocorreu um erro ao processar sua solicitação."
 
+    def generate_conversational(
+        self,
+        query: str,
+        context: str = "",
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None
+    ) -> str:
+        """Gera resposta conversacional sem disclaimer"""
+        try:
+            # Usar o mesmo método generate mas sem o disclaimer
+            response = self.generate(query, context, max_tokens, temperature)
+
+            # Garantir que a resposta seja uma string válida (corrigir codificação)
+            if isinstance(response, str):
+                # Tentar codificar/decodificar para lidar com caracteres especiais
+                try:
+                    response = response.encode('utf-8').decode('utf-8')
+                except (UnicodeEncodeError, UnicodeDecodeError):
+                    # Se houver problemas de codificação, usar apenas ASCII seguro
+                    response = ''.join(c for c in response if ord(c) < 128)
+
+            return response
+
+        except Exception as e:
+            logger.error(f"Erro ao gerar resposta conversacional: {e}")
+            return "Ops! Tive um probleminha técnico. Pode tentar perguntar de novo?"
+
     def _build_user_message(self, query: str, context: str) -> str:
-        """Constrói mensagem do usuário com contexto"""
+        """Constrói mensagem do usuário com contexto de forma conversacional"""
         if context:
-            return f"""Com base nos seguintes documentos:
+            return f"""Baseando-me nestas informações dos documentos:
 
 {context}
 
-Pergunta: {query}
+Alguém me perguntou: {query}
 
-Por favor, responda com base nos documentos fornecidos. Se a informação não estiver nos documentos, indique claramente."""
+Ajude essa pessoa de forma clara e didática, explicando os conceitos jurídicos envolvidos."""
         else:
-            return query
-
-    def add_disclaimer(self, response: str) -> str:
-        """Adiciona disclaimer legal às respostas"""
-        disclaimer = "\n\n*⚖️ Nota: Esta é uma resposta gerada por IA com base em documentos disponíveis. Para questões legais específicas, consulte sempre um profissional qualificado.*"
-        return response + disclaimer
+            return f"Alguém me perguntou: {query}\n\nAjude de forma clara e didática, explicando os conceitos jurídicos envolvidos."

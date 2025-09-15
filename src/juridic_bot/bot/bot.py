@@ -42,14 +42,18 @@ class JuridicBot(commands.Bot):
     async def setup_hook(self):
         """Configuração inicial do bot"""
         # Sincronizar comandos slash
-        if Config.DISCORD_GUILD_ID:
-            guild = discord.Object(id=int(Config.DISCORD_GUILD_ID))
-            self.tree.copy_global_to(guild=guild)
-            await self.tree.sync(guild=guild)
-            logger.info(f"Comandos sincronizados para guild {Config.DISCORD_GUILD_ID}")
-        else:
-            await self.tree.sync()
-            logger.info("Comandos globais sincronizados")
+        try:
+            if Config.DISCORD_GUILD_ID and Config.DISCORD_GUILD_ID.strip():
+                guild = discord.Object(id=int(Config.DISCORD_GUILD_ID))
+                self.tree.copy_global_to(guild=guild)
+                await self.tree.sync(guild=guild)
+                logger.info(f"Comandos sincronizados para guild {Config.DISCORD_GUILD_ID}")
+            else:
+                await self.tree.sync()
+                logger.info("Comandos globais sincronizados")
+        except Exception as e:
+            logger.error(f"Erro ao sincronizar comandos: {e}")
+            logger.info("Continuando sem sincronização de comandos")
 
     async def on_ready(self):
         """Evento quando o bot está pronto"""
@@ -79,40 +83,57 @@ class JuridicBot(commands.Bot):
         await self.process_commands(message)
 
     async def handle_query(self, message: discord.Message):
-        """Processa consultas ao RAG"""
+        """Processa consultas ao RAG de forma conversacional"""
         # Remover menção do bot da query
         query = message.content.replace(f'<@{self.user.id}>', '').strip()
 
         if not query:
-            await message.reply("Por favor, faça uma pergunta após me mencionar!")
+            # Resposta amigável quando não há pergunta específica
+            responses = [
+                "Olá! 👋 Sou um assistente jurídico especializado em concursos públicos. Como posso te ajudar hoje?",
+                "Oi! 😊 Estou aqui para ajudar com dúvidas sobre direito. O que você gostaria de saber?",
+                "Olá! 📚 Pronto para tirar dúvidas sobre legislação e direito. Qual é sua pergunta?"
+            ]
+            await message.reply(responses[hash(message.author.id) % len(responses)])
             return
 
         # Indicador de digitação
         async with message.channel.typing():
             try:
                 # Buscar documentos relevantes
-                documents = self.retriever.search(query)
+                documents = self.retriever.search(query, k=3)
+
+                if not documents:
+                    # Resposta quando não encontra documentos
+                    responses = [
+                        "Hmm, não encontrei informações específicas sobre isso nos meus documentos. Poderia reformular a pergunta ou dar mais detalhes?",
+                        "Não tenho informações precisas sobre esse tema ainda. Que tal tentar uma pergunta mais específica sobre direito?",
+                        "Ops, parece que não tenho dados suficientes sobre isso. Tente perguntar sobre algum aspecto específico do direito brasileiro!"
+                    ]
+                    await message.reply(responses[hash(query) % len(responses)])
+                    return
 
                 # Formatar contexto
                 context = self.retriever.format_context(documents)
 
-                # Gerar resposta
-                response = self.llm_client.generate(query, context)
+                # Gerar resposta conversacional
+                response = self.llm_client.generate_conversational(query, context)
 
-                # Adicionar disclaimer
-                response = self.llm_client.add_disclaimer(response)
+                # Limitar tamanho para evitar problemas
+                if len(response) > 1800:
+                    response = response[:1800] + "..."
 
-                # Adicionar fontes citadas
-                if documents:
-                    sources = list(set(doc.metadata.get('source', 'N/A') for doc in documents))
-                    response += f"\n\n📚 **Fontes consultadas:** {', '.join(sources)}"
-
-                # Enviar resposta (dividir se necessário)
-                await self.send_long_message(message, response)
+                await message.reply(response)
 
             except Exception as e:
                 logger.error(f"Erro ao processar query: {e}")
-                await message.reply("❌ Ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.")
+                # Resposta de erro mais amigável
+                error_responses = [
+                    "Desculpe, tive um probleminha técnico. Pode tentar perguntar de novo?",
+                    "Ops! Algo deu errado. Tente reformular sua pergunta, por favor!",
+                    "Hmm, parece que houve um erro. Que tal tentar novamente?"
+                ]
+                await message.reply(error_responses[hash(str(e)) % len(error_responses)])
 
     async def send_long_message(self, message: discord.Message, content: str):
         """Envia mensagens longas divididas em chunks"""
@@ -207,6 +228,44 @@ async def reindex(interaction: discord.Interaction):
         await interaction.followup.send(f"❌ Erro ao reindexar: {str(e)}")
 
 
+@bot.tree.command(name="pergunta")
+async def pergunta(interaction: discord.Interaction, pergunta: str):
+    """Faça uma pergunta jurídica ao bot"""
+    await interaction.response.defer()
+
+    try:
+        # Buscar documentos relevantes
+        documents = bot.retriever.search(pergunta, k=5)
+
+        if not documents:
+            await interaction.followup.send("❌ Não encontrei informações relevantes para sua pergunta. Tente reformular ou adicionar mais detalhes.")
+            return
+
+        # Formatar contexto
+        context = bot.retriever.format_context(documents)
+
+        # Gerar resposta usando LLM
+        response = bot.llm_client.generate(pergunta, context)
+
+        # Adicionar disclaimer
+        response = bot.llm_client.add_disclaimer(response)
+
+        # Adicionar fontes citadas
+        if documents:
+            sources = list(set(doc.metadata.get('source', 'N/A') for doc in documents))
+            response += f"\n\n📚 **Fontes consultadas:** {', '.join(sources[:3])}"  # Limitar a 3 fontes
+
+        # Verificar tamanho da resposta
+        if len(response) > 1900:  # Discord limit
+            response = response[:1900] + "\n\n... (resposta truncada)"
+
+        await interaction.followup.send(response)
+
+    except Exception as e:
+        logger.error(f"Erro ao processar pergunta: {e}")
+        await interaction.followup.send("❌ Desculpe, ocorreu um erro ao processar sua solicitação.\n\n⚖️ Nota: Esta é uma resposta gerada por IA com base em documentos disponíveis. Para questões legais específicas, consulte sempre um profissional qualificado.")
+
+
 @bot.tree.command(name="buscar_lei")
 async def buscar_lei(interaction: discord.Interaction, numero: str, ano: str = None):
     """Busca uma lei específica"""
@@ -249,7 +308,7 @@ async def ajuda(interaction: discord.Interaction):
 
     embed.add_field(
         name="Comandos",
-        value="`/ping` - Verifica latência\n`/status` - Status do sistema\n`/buscar_lei` - Busca lei específica\n`/ajuda` - Este menu",
+        value="`/pergunta` - Faça perguntas jurídicas\n`/ping` - Verifica latência\n`/status` - Status do sistema\n`/buscar_lei` - Busca lei específica\n`/ajuda` - Este menu",
         inline=False
     )
 
