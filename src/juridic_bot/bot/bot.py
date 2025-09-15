@@ -75,6 +75,9 @@ class JuridicBot(commands.Bot):
         if message.author == self.user:
             return
 
+        # Log para debug
+        logger.info(f"Mensagem detectada: {message.content} | Mencionado: {self.user.mentioned_in(message)} | É DM: {isinstance(message.channel, discord.DMChannel)}")
+
         # Verificar se o bot foi mencionado ou é DM
         if self.user.mentioned_in(message) or isinstance(message.channel, discord.DMChannel):
             await self.handle_query(message)
@@ -84,8 +87,13 @@ class JuridicBot(commands.Bot):
 
     async def handle_query(self, message: discord.Message):
         """Processa consultas ao RAG de forma conversacional"""
-        # Remover menção do bot da query
-        query = message.content.replace(f'<@{self.user.id}>', '').strip()
+        # Remover menção do bot da query (diferentes formatos)
+        query = message.content
+        query = query.replace(f'<@{self.user.id}>', '').strip()
+        query = query.replace(f'<@!{self.user.id}>', '').strip()
+
+        # Log para debug
+        logger.info(f"Mensagem recebida de {message.author}: '{message.content}' -> Query: '{query}'")
 
         if not query:
             # Resposta amigável quando não há pergunta específica
@@ -100,23 +108,18 @@ class JuridicBot(commands.Bot):
         # Indicador de digitação
         async with message.channel.typing():
             try:
-                # Buscar documentos relevantes
+                # Tentar buscar documentos relevantes (se disponível)
                 documents = self.retriever.search(query, k=3)
 
-                if not documents:
-                    # Resposta quando não encontra documentos
-                    responses = [
-                        "Hmm, não encontrei informações específicas sobre isso nos meus documentos. Poderia reformular a pergunta ou dar mais detalhes?",
-                        "Não tenho informações precisas sobre esse tema ainda. Que tal tentar uma pergunta mais específica sobre direito?",
-                        "Ops, parece que não tenho dados suficientes sobre isso. Tente perguntar sobre algum aspecto específico do direito brasileiro!"
-                    ]
-                    await message.reply(responses[hash(query) % len(responses)])
-                    return
+                # Formatar contexto se existirem documentos
+                context = ""
+                if documents:
+                    context = self.retriever.format_context(documents)
+                    logger.info(f"Encontrados {len(documents)} documentos relevantes")
+                else:
+                    logger.info("Nenhum documento encontrado, usando conhecimento geral")
 
-                # Formatar contexto
-                context = self.retriever.format_context(documents)
-
-                # Gerar resposta conversacional
+                # Gerar resposta conversacional (com ou sem contexto)
                 response = self.llm_client.generate_conversational(query, context)
 
                 # Limitar tamanho para evitar problemas
@@ -269,7 +272,22 @@ async def pergunta(interaction: discord.Interaction, pergunta: str):
 
     except Exception as e:
         logger.error(f"Erro ao processar pergunta: {e}")
-        await interaction.followup.send("❌ Desculpe, ocorreu um erro ao processar sua solicitação.\n\n⚖️ Nota: Esta é uma resposta gerada por IA com base em documentos disponíveis. Para questões legais específicas, consulte sempre um profissional qualificado.")
+        # Usar sistema de erro conversacional consistente
+        if "rate limit" in str(e).lower():
+            error_msg = "Ops! Estou um pouco sobrecarregado agora. Pode tentar novamente em alguns minutos? ⏳"
+        elif "timeout" in str(e).lower():
+            error_msg = "Hmm, a resposta está demorando um pouco. Que tal tentar uma pergunta mais simples? 🕐"
+        elif "embedding" in str(e).lower():
+            error_msg = "Tive um probleminha com a busca de informações. Pode reformular a pergunta? 🔍"
+        else:
+            error_responses = [
+                "Desculpe, tive um probleminha técnico. Pode tentar perguntar de novo? 🔧",
+                "Ops! Algo deu errado. Tente reformular sua pergunta, por favor! 😅",
+                "Hmm, parece que houve um erro. Que tal tentar novamente? 🤔"
+            ]
+            error_msg = error_responses[hash(str(e)) % len(error_responses)]
+
+        await interaction.followup.send(error_msg)
 
 
 @bot.tree.command(name="buscar_lei")

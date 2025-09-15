@@ -4,11 +4,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Projeto Overview
 
-Este é um **Bot Discord especializado em direito para concursos públicos** com capacidades RAG (Retrieval-Augmented Generation). O bot utiliza embeddings e LLMs para responder perguntas jurídicas baseadas em documentos indexados.
+Este é um **Bot Discord conversacional especializado em direito para concursos públicos** com capacidades RAG (Retrieval-Augmented Generation). O bot opera em **modo conversacional** - responde naturalmente a menções e DMs sem comandos complexos, funcionando como um professor jurídico amigável.
 
 ## Comandos de Desenvolvimento
 
-### Dependências e Ambiente
+### UV Package Manager (Recomendado)
+```bash
+# Instalar dependências principais
+uv sync
+
+# Instalar com dependências de desenvolvimento
+uv sync --dev
+
+# Executar o bot
+uv run juridic-bot
+
+# Executar testes
+uv run pytest
+
+# Code quality
+uv run black src/
+uv run isort src/
+uv run flake8 src/
+uv run mypy src/
+```
+
+### Dependências Tradicionais (pip)
 ```bash
 # Instalar dependências principais
 pip install -r requirements.txt
@@ -80,11 +101,13 @@ src/juridic_bot/
     └── client.py       # Cliente OpenRouter/LLM para geração de respostas
 ```
 
-### Fluxo RAG
-1. **Ingestão**: `DocumentProcessor` processa PDFs/TXTs da pasta `knowledge/`
+### Fluxo RAG Conversacional
+1. **Ingestão**: `DocumentProcessor` processa PDFs/TXTs/DOCX da pasta `knowledge/`
 2. **Indexação**: ChromaDB armazena embeddings via OpenAI `text-embedding-3-small`
-3. **Busca**: `RAGRetriever` faz busca vetorial por similaridade
-4. **Geração**: `LLMClient` usa OpenRouter (Claude/GPT) para gerar respostas
+3. **Escuta**: Bot monitora menções (@bot) e DMs automaticamente
+4. **Busca**: `RAGRetriever` faz busca vetorial por similaridade (TOP_K=5)
+5. **Geração**: `LLMClient` usa OpenRouter (DeepSeek) para respostas conversacionais
+6. **Resposta**: Mensagens amigáveis sem disclaimers, como professor experiente
 
 ### Sistema de Configuração
 - **Config centralizada**: `src/juridic_bot/config.py` usa variáveis de ambiente
@@ -105,7 +128,7 @@ DISCORD_GUILD_ID=optional_guild
 DISCORD_OWNER_ID=your_user_id
 
 # Modelos
-OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324
 EMBEDDING_MODEL=text-embedding-3-small
 
 # RAG Settings
@@ -120,24 +143,26 @@ knowledge/
 ├── direito_constitucional/
 ├── direito_administrativo/
 ├── direito_penal/
-└── direito_civil/
+├── direito_civil/
+└── direito_processual/
 ```
 Formatos suportados: `.pdf`, `.txt`, `.md`, `.docx`
 
-## Comandos Discord
+**Organização recomendada**: Separar documentos por área jurídica para facilitar a busca contextual.
 
-### Comandos Slash
-- `/ping` - Latência do bot
+## Sistema de Interação
+
+### Modo Conversacional (Principal)
+- **Menção no servidor**: `@SamerPosterga qual a diferença entre habeas corpus e habeas data?`
+- **DM direta**: `Oi! Me explica o que é improbidade administrativa?`
+- **Respostas naturais**: Tom de professor amigável, sem disclaimers
+- **Tratamento de erro**: Mensagens variadas e contextualizadas
+
+### Comandos Técnicos (Administrativos)
+- `/ping` - Verifica se o bot está respondendo
 - `/status` - Status do sistema (CPU, RAM, uptime)
-- `/pergunta <texto>` - Pergunta jurídica com contexto RAG
-- `/buscar_lei <numero> [ano]` - Busca lei específica
 - `/reindex` - Reindexa documentos (apenas owner)
-- `/ajuda` - Menu de ajuda
-
-### Interação Natural
-- **Menção**: `@Bot qual a legislação sobre...`
-- **DM**: Mensagem direta ao bot
-- **Respostas conversacionais** com disclaimer legal
+- Comandos slash tradicionais são opcionais e para usuários avançados
 
 ## Padrões de Código
 
@@ -203,7 +228,14 @@ print([d.page_content[:100] for d in docs])
 
 ### Environment Setup
 1. Copiar `.env.example` para `.env`
-2. Configurar tokens/APIs
-3. Adicionar documentos em `knowledge/`
-4. Executar indexação inicial
-5. Iniciar bot
+2. Configurar tokens/APIs obrigatórias (Discord, OpenRouter, OpenAI)
+3. Adicionar documentos jurídicos em `knowledge/` organizados por área
+4. Executar indexação inicial automática no primeiro run
+5. Iniciar bot e testar com menções conversacionais
+
+### Características Conversacionais Importantes
+- **Sem comandos slash por padrão**: Usuários simplesmente mencionam o bot
+- **Respostas didáticas**: Explicações como professor, não chatbot formal
+- **Contextualização jurídica**: Foco em concursos públicos brasileiros
+- **Erro handling inteligente**: Mensagens variadas para situações diferentes
+- **Performance**: Modo conversacional otimizado para fluidez

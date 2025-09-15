@@ -22,14 +22,24 @@ class RAGRetriever:
     def load_vectorstore(self) -> Chroma:
         """Carrega o vectorstore existente"""
         try:
+            logger.info(f"Tentando carregar vectorstore de: {Config.CHROMA_DIR}")
             vectorstore = Chroma(
                 persist_directory=str(Config.CHROMA_DIR),
                 embedding_function=self.embedding_service.get_langchain_embeddings()
             )
-            logger.info("Vectorstore carregado com sucesso")
+
+            # Testar se tem documentos
+            try:
+                count = vectorstore._collection.count()
+                logger.info(f"Vectorstore carregado com {count} documentos")
+            except:
+                logger.warning("Não foi possível contar documentos no vectorstore")
+
             return vectorstore
         except Exception as e:
             logger.error(f"Erro ao carregar vectorstore: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
             return None
 
     def search(self, query: str, k: int = None) -> List[Document]:
