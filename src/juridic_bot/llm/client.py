@@ -67,8 +67,8 @@ IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
                 temperature=temperature or Config.TEMPERATURE,
                 # Headers recomendados pelo OpenRouter
                 extra_headers={
-                    "HTTP-Referer": "https://github.com/juridic-bot",
-                    "X-Title": "Bot Jurídico para Concursos"
+                    "HTTP-Referer": "https://github.com/prof-ramos/SamerPosterga",
+                    "X-Title": "Juridic Concursos Bot"
                 }
             )
 
@@ -76,7 +76,12 @@ IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
             if hasattr(response, 'usage'):
                 logger.info(f"Tokens usados: {response.usage.total_tokens}")
 
-            return response.choices[0].message.content
+            # Garantir encoding UTF-8 correto
+            content = response.choices[0].message.content
+            if isinstance(content, str):
+                # Garantir que string está em UTF-8
+                return content.encode('utf-8', errors='replace').decode('utf-8')
+            return str(content)
 
         except Exception as e:
             logger.error(f"Erro ao gerar resposta: {e}")
@@ -91,19 +96,8 @@ IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
     ) -> str:
         """Gera resposta conversacional sem disclaimer"""
         try:
-            # Usar o mesmo método generate mas sem o disclaimer
-            response = self.generate(query, context, max_tokens, temperature)
-
-            # Garantir que a resposta seja uma string válida (corrigir codificação)
-            if isinstance(response, str):
-                # Tentar codificar/decodificar para lidar com caracteres especiais
-                try:
-                    response = response.encode('utf-8').decode('utf-8')
-                except (UnicodeEncodeError, UnicodeDecodeError):
-                    # Se houver problemas de codificação, usar apenas ASCII seguro
-                    response = ''.join(c for c in response if ord(c) < 128)
-
-            return response
+            # Usar o mesmo método generate (já trata encoding)
+            return self.generate(query, context, max_tokens, temperature)
 
         except Exception as e:
             logger.error(f"Erro ao gerar resposta conversacional: {e}")
