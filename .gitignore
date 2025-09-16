@@ -145,11 +145,44 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-data/chroma/
-data/RRAG/
+.chroma/
+data/
 logs/
 *.log
+secrets/
+*.env.local
+*.env.production
+
+# Docker
+docker-compose.override.yml
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Build artifacts
+build/
+dist/
 
 # Temporary files
 *.tmp
 *.temp
+
+# Development tools
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# Documentation build
+site/
+docs/_build/

@@ -1,6 +1,10 @@
-# 🤖 Bot Discord Jurídico Conversacional para Concursos
+# Juridic Bot - Assistente Jurídico para Concursos
 
-Assistente jurídico inteligente e amigável para estudantes de concursos públicos no Brasil. Funciona como um chatbot conversacional que responde naturalmente às suas dúvidas sobre direito.
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)](https://hub.docker.com/r/gabrielramosprof/juridic-bot)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com)
+
+Bot Discord conversacional especializado em **direito para concursos públicos brasileiros** com capacidades RAG (Retrieval-Augmented Generation). Funciona como um professor jurídico experiente, respondendo naturalmente a menções e mensagens diretas.
 
 ## ✨ Características
 
@@ -12,315 +16,78 @@ Assistente jurídico inteligente e amigável para estudantes de concursos públi
 - **📄 Múltiplos Formatos**: Suporte a PDF, TXT, Markdown e DOCX
 - **🔧 OpenRouter + OpenAI**: Modelos avançados (DeepSeek + embeddings) para respostas precisas
 
-## 🚀 Instalação
+## 🚀 Início Rápido
 
-### Pré-requisitos
-
-**🐍 Python:**
-- Python 3.11+ ([Download](https://www.python.org/downloads/))
-- ⚠️ **Windows**: Marque "Add Python to PATH" durante a instalação
-
-**🔑 API Keys:**
-- Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
-- OpenRouter API Key ([OpenRouter](https://openrouter.ai/))
-- OpenAI API Key ([OpenAI](https://platform.openai.com/api-keys))
-
-**🐳 Docker (Opcional, mas recomendado):**
-- Docker Desktop ([Download](https://www.docker.com/products/docker-desktop/))
-
-### 🚀 Instalação Rápida com UV
+### Docker (Recomendado)
 
 ```bash
-# Clone o repositório
+# 1. Clonar repositório
 git clone https://github.com/prof-ramos/SamerPosterga.git
 cd SamerPosterga
 
-# Instale as dependências com UV (recomendado)
-uv sync
-
-# Configure as variáveis de ambiente
+# 2. Configurar ambiente
 cp .env.example .env
-# Edite o .env com suas chaves API
+# Editar .env com suas credenciais
 
-# Execute o bot
-uv run juridic-bot
-```
-
-### 🐳 Usando Docker (Recomendado para MacBook M3)
-
-```bash
-# Configure suas variáveis de ambiente
-cp .env.example .env
-# Edite o .env com suas chaves API
-
-# Build da imagem usando o Dockerfile otimizado
-docker-compose build
-
-# Execute com docker-compose (recomendado)
+# 3. Executar
 docker-compose up -d
 
-# Verifique se está rodando
-docker-compose ps
+# 4. Ver logs
 docker-compose logs -f juridic-bot
-
-# Para parar
-docker-compose down
 ```
 
-**💡 Nota**: O Docker resolve automaticamente o problema do `audioop` em sistemas MacBook M3/ARM64.
+### Portainer (Produção)
 
-### 🏗️ Build Multi-Arquitetura
+1. Acesse **Portainer → Stacks → Add Stack**
+2. Cole o conteúdo de [`deploy/portainer/portainer-stack.yml`](./deploy/portainer/portainer-stack.yml)
+3. Configure as variáveis de ambiente obrigatórias
+4. Deploy da stack
 
-```bash
-# Usar o script de build multi-arch
-./scripts/build-multiarch.sh v1.0.0
+➡️ **Guia completo**: [Deploy no Portainer](./deploy/portainer/README.md)
 
-# Ou build manual com suporte a múltiplas arquiteturas
-docker buildx build --platform linux/amd64,linux/arm64 -t juridic-bot:latest -f Dockerfile.optimized .
-```
+## 📋 Pré-requisitos
 
-### 🐳 Deploy com Portainer
+### Credenciais Obrigatórias
 
-Para deploy em ambiente de produção usando Portainer:
+| Serviço | Variável | Onde Obter |
+|---------|----------|------------|
+| Discord | `DISCORD_TOKEN` | [Discord Developer Portal](https://discord.com/developers/applications) |
+| OpenAI | `OPENAI_API_KEY` | [OpenAI API Keys](https://platform.openai.com/api-keys) |
+| OpenRouter | `OPENROUTER_API_KEY` | [OpenRouter Keys](https://openrouter.ai/keys) |
 
-1. Crie os secrets necessários no Portainer
-2. Faça upload do arquivo `deploy/portainer-stack.yml` como uma nova stack
-3. Deploy da stack através da interface do Portainer
+### IDs Discord
 
-### 💻 Windows (Setup Automático)
+- `DISCORD_OWNER_ID`: Seu ID de usuário (clique direito → Copiar ID)
+- `DISCORD_GUILD_ID`: ID do servidor (opcional)
 
-**Opção 1: Command Prompt (.bat)**
-```cmd
-# Clone o repositório
-git clone https://github.com/prof-ramos/SamerPosterga.git
-cd SamerPosterga
-
-# Execute o setup automático
-setup.bat
-```
-
-**Opção 2: PowerShell (.ps1)**
-```powershell
-# Clone o repositório
-git clone https://github.com/prof-ramos/SamerPosterga.git
-cd SamerPosterga
-
-# Execute o setup com PowerShell
-.\setup.ps1
-
-# Opções avançadas:
-.\setup.ps1 -DevMode          # Instala deps de desenvolvimento
-.\setup.ps1 -UseDocker        # Configura apenas para Docker
-```
-
-📖 **Problemas no Windows?** Consulte o [Guia Completo para Windows](WINDOWS.md)
-
-### 📦 Instalação Tradicional (pip)
-
-```bash
-# Instale as dependências
-pip install -r requirements.txt
-
-# Execute o bot
-python -m src.juridic_bot.main
-```
-
-## ⚙️ Configuração
-
-### 📝 Arquivo .env
-
-```env
-# Discord Config
-DISCORD_TOKEN=seu_token_aqui
-DISCORD_APP_ID=seu_app_id_aqui
-DISCORD_GUILD_ID=  # Deixe vazio para modo global
-DISCORD_OWNER_ID=seu_user_id_para_comandos_admin
-
-# OpenRouter Config (LLM principal)
-OPENROUTER_API_KEY=seu_openrouter_key
-OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324
-OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-
-# OpenAI Config (para embeddings)
-OPENAI_API_KEY=sua_openai_key
-EMBEDDING_MODEL=text-embedding-3-small
-
-# RAG Config
-TOP_K=5
-CHUNK_SIZE=1500
-CHUNK_OVERLAP=200
-
-# System Config
-MAX_TOKENS=2000
-TEMPERATURE=0.7
-LOG_LEVEL=INFO
-```
-
-### 🎭 Personalização do System Prompt
-
-O bot usa um **system prompt** para definir seu comportamento conversacional. Você pode customizar completamente como o bot responde modificando esse prompt.
-
-#### 🔧 Personalização via Variável de Ambiente (Recomendado)
-
-A forma mais fácil é definir o prompt personalizado no arquivo `.env`:
-
-```env
-# Prompt personalizado do bot
-SYSTEM_PROMPT="Você é um assistente jurídico especialista em direito brasileiro para concursos públicos. Seja didático, cite leis relevantes e mantenha um tom profissional mas amigável."
-```
-
-**Prioridade**: Se `SYSTEM_PROMPT` estiver definida no `.env`, ela substitui o prompt padrão do código.
-
-#### 📝 Personalização via Código Fonte
-
-Alternativamente, você pode editar diretamente o arquivo `src/juridic_bot/llm/client.py:47-55`:
-
-```python
-self.system_prompt = """Você é um assistente jurídico amigável e especialista em direito brasileiro,
-feito especialmente para ajudar estudantes de concursos públicos.
-
-SEU ESTILO:
-- Seja amigável e conversacional, como um professor experiente
-- Explique conceitos de forma clara e acessível
-- Use analogias quando ajudar a compreensão
-- Mantenha o foco em legislação brasileira
-- Cite leis, artigos e súmulas quando relevante
-- Estrutura respostas de forma lógica e progressiva
-
-DICAS PARA RESPOSTAS:
-1. Comece respondendo diretamente à pergunta
-2. Use o contexto fornecido como base principal
-3. Explique termos técnicos quando necessário
-4. Dê exemplos práticos quando possível
-5. Mantenha respostas concisas mas completas
-6. Termine com uma pergunta ou sugestão se apropriado
-
-IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
-```
-
-#### 💡 Exemplos de Prompts Personalizados
-
-**Para um tom mais formal:**
-```env
-SYSTEM_PROMPT="Você é um assistente jurídico profissional especializado em direito brasileiro para concursos públicos. Forneça respostas precisas, cite legislação completa e mantenha objetividade técnica."
-```
-
-**Para foco em jurisprudência:**
-```env
-SYSTEM_PROMPT="Você é um assistente jurídico especialista em jurisprudência do STF/STJ. Sempre cite precedentes relevantes, súmulas vinculantes e explique o impacto prático das decisões nos concursos."
-```
-
-**Para estudantes iniciantes:**
-```env
-SYSTEM_PROMPT="Você é um professor paciente que explica direito brasileiro de forma simples. Use analogias do dia a dia, evite jargões técnicos desnecessários e seja muito didático com conceitos básicos."
-```
-
-**Para especialização em área específica:**
-```env
-SYSTEM_PROMPT="Você é um especialista em Direito Administrativo para concursos. Foque em licitações, contratos administrativos, servidores públicos e responsabilidade do Estado. Cite sempre a Lei 8.666/93 e 14.133/21."
-```
-
-#### ⚠️ Dicas Importantes para Personalização
-
-- **Mantenha o foco jurídico**: Sempre inclua referências ao direito brasileiro
-- **Preserve o tom conversacional**: O bot foi projetado para interação natural via menções
-- **Teste as mudanças**: Reinicie o bot e teste com diferentes tipos de perguntas
-- **Backup**: Anote o prompt original antes de modificar
-- **Restart necessário**: Após alterar o `.env`, reinicie o bot para aplicar as mudanças
-
-#### 🔄 Como Aplicar as Mudanças
-
-```bash
-# 1. Edite o .env com seu prompt personalizado
-nano .env
-
-# 2. Reinicie o bot
-# Com UV:
-uv run juridic-bot
-
-# Com Docker:
-docker-compose restart juridic-bot
-
-# 3. Teste o novo comportamento
-# Mencione o bot no Discord e observe as mudanças
-```
-
-### 🎯 Modo Conversacional
-
-O bot está configurado para **modo conversacional**:
-- ✅ **Sem comandos slash** - interação natural
-- ✅ **Respostas amigáveis** - tom de professor
-- ✅ **Sem disclaimers** - conversa fluida
-- ✅ **Tratamento de erros** inteligente
-
-### Documentos
-
-Coloque seus documentos na pasta `knowledge/`:
-- `knowledge/` - Documentos para indexação RAG
-- Organize em subpastas por área do direito:
-  - `knowledge/direito_constitucional/`
-  - `knowledge/direito_administrativo/`
-  - `knowledge/direito_penal/`
-  - `knowledge/direito_civil/`
-  - etc.
-- Suportados: `.pdf`, `.txt`, `.md`, `.docx`
-
-## 🎯 Como Usar
-
-### 🤖 Modo Conversacional
-
-O bot funciona como um **chatbot amigável** - apenas mencione-o ou envie DM!
-
-#### 📱 Via Menção no Servidor
-```
-@SamerPosterga Qual é a diferença entre habeas corpus e habeas data?
-```
-
-#### 💬 Via Mensagem Direta (DM)
-```
-Oi! Me explica o que é improbidade administrativa?
-```
-
-#### 🎓 Exemplos de Perguntas
-- "O que é devido processo legal?"
-- "Como funciona a prescrição penal?"
-- "Qual a diferença entre mandado de segurança e ação popular?"
-- "Me explica sobre responsabilidade civil do Estado"
-
-### 💡 Características das Respostas
-
-- **📖 Explicações Didáticas**: Conceitos explicados passo a passo
-- **📚 Baseadas em Documentos**: Respostas fundamentadas em legislação
-- **🎯 Foco em Concursos**: Conteúdo relevante para provas
-- **😊 Tom Amigável**: Como conversar com um professor experiente
-- **⚡ Respostas Rápidas**: Sem complicações técnicas
-
-### 🔧 Comandos Técnicos (Opcional)
-
-Para usuários avançados, alguns comandos ainda estão disponíveis:
-- `/ping` - Verifica se o bot está respondendo
-- `/status` - Mostra informações do sistema
-- `/reindex` - Reindexa documentos (apenas admin)
-
-## 🏗️ Arquitetura
+## 📁 Estrutura do Projeto
 
 ```
-src/juridic_bot/
-├── config.py          # ⚙️ Configurações centralizadas
-├── main.py           # 🚀 Ponto de entrada
-├── bot/              # 🤖 Módulo Discord (modo conversacional)
-│   ├── __init__.py
-│   └── bot.py        # 💬 Lógica de chat e menções
-├── rag/              # 🧠 Sistema RAG inteligente
-│   ├── __init__.py
-│   ├── embeddings.py # 🔍 Serviço de embeddings OpenAI
-│   ├── ingest.py     # 📄 Processamento de documentos
-│   └── retriever.py  # 🎯 Busca e recuperação contextual
-└── llm/              # 🤖 Cliente LLM conversacional
-    ├── __init__.py
-    └── client.py     # 💭 Respostas naturais via OpenRouter
+juridic-bot/
+├── src/                    # Código fonte
+│   └── juridic_bot/
+│       ├── bot/           # Discord bot implementation
+│       ├── rag/           # RAG system (retrieval, embeddings)
+│       ├── llm/           # LLM client (OpenRouter)
+│       └── config.py      # Configuration management
+├── tests/                  # Testes automatizados
+├── docs/                   # Documentação completa
+│   ├── development/       # Guias de desenvolvimento
+│   └── deployment/        # Guias de deploy
+├── deploy/                 # Arquivos de deployment
+│   ├── docker/           # Docker configs
+│   └── portainer/        # Portainer stack
+├── scripts/               # Scripts auxiliares
+├── knowledge/             # Base de conhecimento jurídico
+└── README.md              # Este arquivo
+```
 
-knowledge/            # 📚 Base de conhecimento jurídica
+## 📚 Base de Conhecimento
+
+Organize documentos jurídicos em `knowledge/`:
+
+```
+knowledge/
 ├── direito_constitucional/
 ├── direito_administrativo/
 ├── direito_penal/
@@ -328,203 +95,125 @@ knowledge/            # 📚 Base de conhecimento jurídica
 └── direito_processual/
 ```
 
-### 🎭 Modo Conversacional
+**Formatos suportados**: `.pdf`, `.txt`, `.md`, `.docx`
 
-O bot opera em **modo conversacional inteligente**:
+O bot indexa automaticamente na primeira execução.
 
-1. **👂 Escuta**: Monitora menções (@bot) e DMs
-2. **🧠 Processa**: Usa RAG para buscar contexto relevante
-3. **💭 Responde**: Gera respostas naturais e didáticas
-4. **😊 Interage**: Mantém conversa fluida e amigável
+## 🐳 Docker
 
-**Vantagens:**
-- ✅ Interação natural como conversar com um professor
-- ✅ Sem barreiras técnicas (comandos, sintaxes)
-- ✅ Respostas contextualizadas com a legislação
-- ✅ Tratamento inteligente de dúvidas fora do escopo
+### Imagem Oficial
 
-## 💬 Exemplos de Uso
-
-### 📚 Perguntas Educacionais
-```
-Usuário: @SamerPosterga O que é devido processo legal?
-
-Bot: Olá! O devido processo legal é um princípio fundamental do direito constitucional brasileiro. Ele está previsto no art. 5º, LIV, da Constituição Federal:
-
-"ninguém será privado da liberdade ou de seus bens sem o devido processo legal"
-
-Na prática, isso significa que qualquer atuação do Estado que afete direitos individuais deve seguir um procedimento adequado, com contraditório e ampla defesa. É uma garantia contra arbitrariedades do poder público!
-
-Quer que eu explique algum aspecto específico sobre isso? 🤔
-```
-
-### ⚖️ Consultas Jurídicas
-```
-Usuário: Me explica a diferença entre mandado de segurança e habeas corpus
-
-Bot: Claro! Vamos lá:
-
-**Habeas Corpus** (art. 5º, LXVIII, CF):
-- Protege a liberdade de locomoção
-- Usado contra prisão ou ameaça de prisão ilegal
-- Prazo: 24 horas para impetração
-
-**Mandado de Segurança** (art. 5º, LXIX, CF):
-- Protege qualquer direito líquido e certo
-- Mais amplo: pode ser contra atos de autoridade em geral
-- Prazo: 120 dias para impetração
-
-O HC é específico para liberdade, enquanto o MS vale para outros direitos. Ambos são ações constitucionais de proteção individual! 📖
-```
-
-## 🧪 Desenvolvimento
-
-### 🛠️ Configuração com UV (Recomendado)
-
-**Linux/macOS:**
 ```bash
-# Instale dependências incluindo dev
+# Executar imagem do DockerHub
+docker run -d \
+  --name juridic-bot \
+  -e DISCORD_TOKEN=seu_token \
+  -e OPENAI_API_KEY=sua_key \
+  -e OPENROUTER_API_KEY=sua_key \
+  -v $(pwd)/knowledge:/app/knowledge \
+  gabrielramosprof/juridic-bot:latest
+```
+
+### Build Local
+
+```bash
+# Build otimizado
+docker build -f deploy/docker/Dockerfile -t juridic-bot .
+
+# Build multiarch
+docker buildx build --platform linux/amd64,linux/arm64 -t juridic-bot .
+```
+
+## ⚙️ Configuração Avançada
+
+### System Prompt Personalizado
+
+```bash
+# Via variável de ambiente
+SYSTEM_PROMPT="Seu prompt personalizado aqui..."
+```
+
+### Configurações RAG
+
+```bash
+TOP_K=5                    # Documentos por busca
+CHUNK_SIZE=1500           # Tamanho dos chunks
+CHUNK_OVERLAP=200         # Sobreposição entre chunks
+EMBEDDING_MODEL=text-embedding-3-small
+```
+
+### Modelos LLM
+
+```bash
+# Modelos gratuitos (OpenRouter)
+OPENROUTER_MODEL=qwen/qwen3-coder:free
+OPENROUTER_MODEL=google/gemma-2-9b-it:free
+
+# Modelos premium
+OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
+OPENROUTER_MODEL=openai/gpt-4o
+```
+
+## 🔧 Desenvolvimento
+
+### Setup Local
+
+```bash
+# 1. Instalar UV (recomendado)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 2. Instalar dependências
 uv sync --dev
 
-# Execute os testes
-uv run pytest
+# 3. Configurar ambiente
+cp .env.example .env
+# Editar .env
 
-# Verifique qualidade do código
-uv run flake8 src/
-uv run mypy src/
+# 4. Executar bot
+uv run juridic-bot
+```
+
+### Comandos Úteis
+
+```bash
+# Testes
+uv run pytest
+uv run pytest --cov=src
+
+# Code Quality
 uv run black src/
 uv run isort src/
+uv run flake8 src/
+uv run mypy src/
 
-# Execute o bot em modo desenvolvimento
-uv run juridic-bot
+# Executar tudo
+uv run black src/ && uv run isort src/ && uv run flake8 src/ && uv run mypy src/
 ```
 
-**Windows:**
-```powershell
-# Use o setup automático com modo desenvolvimento
-.\setup.ps1 -DevMode
+## 📖 Documentação
 
-# Ou manualmente:
-uv sync --dev
-uv run pytest
-uv run juridic-bot
-```
-
-### 📦 Desenvolvimento Tradicional
-
-```bash
-# Instale dependências de desenvolvimento
-pip install -e ".[dev]"
-
-# Execute os testes
-pytest
-
-# Verifique qualidade do código
-flake8 src/
-mypy src/
-black src/
-isort src/
-```
-
-### Estrutura de Testes
-
-```bash
-tests/
-├── __init__.py
-├── test_config.py     # Testes de configuração
-└── test_rag.py       # Testes do sistema RAG
-```
-
-## 📊 Monitoramento
-
-### Logs
-
-Os logs são salvos em `logs/bot.log` com diferentes níveis:
-- DEBUG: Informações detalhadas para desenvolvimento
-- INFO: Operações normais
-- WARNING: Avisos não críticos
-- ERROR: Erros que precisam atenção
-
-### Métricas
-
-- Uso de tokens por consulta
-- Tempo de resposta
-- Taxa de sucesso de buscas
-- Status do sistema (CPU, RAM, uptime)
-
-## 🔒 Segurança
-
-- **Nunca commite chaves API** no repositório
-- Use sempre variáveis de ambiente para secrets
-- Logs não incluem informações sensíveis
-- Validação rigorosa de entrada de usuários
+- **[Guia de Desenvolvimento](./docs/development/)** - Setup, arquitetura e contribuição
+- **[Guia de Deploy](./docs/deployment/)** - Produção, Portainer e monitoramento
+- **[API Reference](./docs/api/)** - Documentação técnica dos módulos
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma branch: `git checkout -b feature/nova-funcionalidade`
+3. Commit: `git commit -m 'feat: adicionar nova funcionalidade'`
+4. Push: `git push origin feature/nova-funcionalidade`
 5. Abra um Pull Request
 
-### Padrões de Código
+## 📄 Licença
 
-- **Black**: Formatação automática
-- **isort**: Organização de imports
-- **flake8**: Linting
-- **mypy**: Type checking
-- **pytest**: Testes
+Este projeto está sob a licença MIT. Veja [LICENSE](./LICENSE) para detalhes.
 
-## 📝 Licença
+## 🆘 Suporte
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
-## 📞 Suporte e Comunidade
-
-### 🆘 Precisa de Ajuda?
-- 📧 **Email**: suporte@juridic-bot.com
-- 🐛 **Issues**: [GitHub Issues](https://github.com/prof-ramos/SamerPosterga/issues)
-- 📖 **Documentação**: [Wiki do Projeto](https://github.com/prof-ramos/SamerPosterga/wiki)
-- 💬 **Discord**: Junte-se ao nosso servidor para discussões sobre direito e concursos
-
-### 🤝 Como Contribuir
-
-1. **Fork** o projeto
-2. **Adicione documentos** na pasta `knowledge/`
-3. **Teste** com suas dúvidas de concurso
-4. **Abra uma Issue** com sugestões ou problemas
-5. **Envie um PR** com melhorias
-
-### 📊 Status do Projeto
-
-- ✅ **Modo Conversacional**: Ativo e funcional
-- ✅ **RAG System**: ChromaDB + OpenAI embeddings (migrado para langchain-chroma)
-- ✅ **LLM Integration**: OpenRouter (DeepSeek)
-- ✅ **Documentos**: Constituição Federal incluída
-- ✅ **Docker**: Multi-arch support (testado e funcionando)
-- ✅ **UV Package Manager**: Configurado
-- ✅ **Tests**: Testes funcionando com pytest-asyncio
-- ✅ **Dependencies**: Atualizadas e funcionais
-
-### 🆕 Atualizações Recentes
-
-**v1.1.0 - Setembro 2025**
-- ✅ **LangChain Chroma Migration**: Migração para `langchain-chroma` (resolve deprecation warnings)
-- ✅ **Docker Otimizado**: Docker funcionando em MacBook M3/ARM64 sem audioop errors
-- ✅ **Pytest Asyncio**: Configuração corrigida para testes assíncronos
-- ✅ **Dependencies**: Dependências atualizadas e funcionais
-- ✅ **Environment Variables**: Simplificação da configuração Docker com `.env`
-
-### 🎯 Roadmap
-
-- [ ] Adicionar mais documentos jurídicos
-- [ ] Implementar sistema de feedback das respostas
-- [ ] Suporte a múltiplos idiomas
-- [ ] Interface web para administração
-- [ ] Integração com bases de jurisprudência
+- **Issues**: [GitHub Issues](https://github.com/prof-ramos/SamerPosterga/issues)
+- **Documentação**: [Pasta docs/](./docs/)
+- **Docker**: [DockerHub](https://hub.docker.com/r/gabrielramosprof/juridic-bot)
 
 ---
 
-**⭐ Star este repositório** se está ajudando nos seus estudos para concursos! 📚✨
-
-**Desenvolvido com ❤️ para estudantes de direito no Brasil** 🇧🇷
+**Desenvolvido com ❤️ para a comunidade jurídica brasileira**
