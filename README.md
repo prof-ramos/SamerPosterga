@@ -27,13 +27,16 @@ cd SamerPosterga
 
 # 2. Configurar ambiente
 cp .env.example .env
-# Editar .env com suas credenciais
+# Editar .env com suas credenciais (ver seção Pré-requisitos)
 
-# 3. Executar
+# 3. Executar do diretório raiz
 docker-compose up -d
 
 # 4. Ver logs
 docker-compose logs -f juridic-bot
+
+# 5. Status do container
+docker-compose ps
 ```
 
 ### Portainer (Produção)
@@ -117,8 +120,14 @@ docker run -d \
 ### Build Local
 
 ```bash
-# Build otimizado
-docker build -f deploy/docker/Dockerfile -t juridic-bot .
+# Build padrão (do diretório raiz)
+docker build -t juridic-bot .
+
+# Build com docker-compose
+docker-compose build
+
+# Rebuild forçado (limpa cache)
+docker-compose up -d --build
 
 # Build multiarch
 docker buildx build --platform linux/amd64,linux/arm64 -t juridic-bot .
@@ -145,11 +154,17 @@ EMBEDDING_MODEL=text-embedding-3-small
 ### Modelos LLM
 
 ```bash
-# Modelos gratuitos (OpenRouter)
-OPENROUTER_MODEL=qwen/qwen3-coder:free
-OPENROUTER_MODEL=google/gemma-2-9b-it:free
+# 🆓 Modelos gratuitos recomendados (OpenRouter)
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324     # ✅ Recomendado
+OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct:free
+OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free
 
-# Modelos premium
+# 💰 Modelos pagos baratos (<$1/1M tokens)
+OPENROUTER_MODEL=deepseek/deepseek-chat             # ~$0.14/1M
+OPENROUTER_MODEL=qwen/qwen-2.5-7b-instruct         # ~$0.18/1M
+OPENROUTER_MODEL=mistralai/mistral-7b-instruct      # ~$0.25/1M
+
+# 🚀 Modelos premium
 OPENROUTER_MODEL=anthropic/claude-3.5-sonnet
 OPENROUTER_MODEL=openai/gpt-4o
 ```
@@ -188,6 +203,70 @@ uv run mypy src/
 
 # Executar tudo
 uv run black src/ && uv run isort src/ && uv run flake8 src/ && uv run mypy src/
+```
+
+## 🔍 Troubleshooting
+
+### Problemas Comuns
+
+#### Bot responde "Desculpe, ocorreu um erro..."
+```bash
+# Verificar logs
+docker-compose logs juridic-bot --tail=50
+
+# Problemas mais comuns:
+# 1. Rate limiting de modelo gratuito
+# 2. Chaves de API inválidas
+# 3. Conectividade de rede
+```
+
+#### Rate Limiting (429 Error)
+```bash
+# Trocar para modelo mais estável
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324
+
+# Ou usar modelo pago
+OPENROUTER_MODEL=deepseek/deepseek-chat
+```
+
+#### Container não inicia
+```bash
+# Verificar .env
+cat .env
+
+# Rebuild forçado
+docker-compose down
+docker-compose up -d --build
+
+# Verificar logs de erro
+docker-compose logs juridic-bot
+```
+
+#### Dependências em falta
+```bash
+# Atualizar requirements.txt se necessário
+# O arquivo deve incluir: langchain-chroma>=0.1.0
+docker-compose up -d --build
+```
+
+### Comandos de Debug
+
+```bash
+# Status do container
+docker-compose ps
+
+# Logs em tempo real
+docker-compose logs juridic-bot -f
+
+# Reiniciar apenas o bot
+docker-compose restart juridic-bot
+
+# Parar tudo
+docker-compose down
+
+# Limpeza completa
+docker-compose down
+docker system prune -f
 ```
 
 ## 📖 Documentação

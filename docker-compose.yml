@@ -2,7 +2,7 @@ services:
   juridic-bot:
     build:
       context: .
-      dockerfile: Dockerfile.optimized
+      dockerfile: Dockerfile
     container_name: juridic-concursos-bot
     restart: unless-stopped
     env_file:

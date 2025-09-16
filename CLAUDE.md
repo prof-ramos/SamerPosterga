@@ -73,15 +73,27 @@ black src/ && isort src/ && flake8 src/ && mypy src/
 ```
 
 ### Docker
+
 ```bash
-# Build da imagem
+# Build da imagem (do diretório raiz)
 docker build -t juridic-bot .
 
-# Executar com docker-compose
+# Executar com docker-compose (do diretório raiz onde está o código)
+cd /path/to/SamerPosterga  # Diretório raiz com src/
 docker-compose up -d
 
 # Ver logs
 docker-compose logs -f juridic-bot
+
+# Status do container
+docker-compose ps
+
+# Rebuild forçado (após mudanças de dependências)
+docker-compose down
+docker-compose up -d --build
+
+# Reiniciar apenas o bot
+docker-compose restart juridic-bot
 ```
 
 ## Arquitetura do Sistema
@@ -127,8 +139,12 @@ OPENAI_API_KEY=your_key
 DISCORD_GUILD_ID=optional_guild
 DISCORD_OWNER_ID=your_user_id
 
-# Modelos
-OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324
+# Modelos OpenRouter (recomendados)
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324    # ✅ Gratuito, estável
+# OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct:free  # Alternativa gratuita
+# OPENROUTER_MODEL=deepseek/deepseek-chat                 # Pago (~$0.14/1M)
+
+# Embeddings OpenAI
 EMBEDDING_MODEL=text-embedding-3-small
 
 # RAG Settings
@@ -239,3 +255,111 @@ print([d.page_content[:100] for d in docs])
 - **Contextualização jurídica**: Foco em concursos públicos brasileiros
 - **Erro handling inteligente**: Mensagens variadas para situações diferentes
 - **Performance**: Modo conversacional otimizado para fluidez
+
+## Troubleshooting e Debug
+
+### Problemas Comuns Durante Desenvolvimento
+
+#### 1. Bot retorna "Desculpe, ocorreu um erro..."
+```bash
+# Verificar logs detalhados
+docker-compose logs juridic-bot --tail=50
+
+# Principais causas:
+# - Rate limiting (429 Error) de modelos gratuitos
+# - Chaves de API inválidas ou expiradas
+# - Problemas de conectividade de rede
+# - Modelos OpenRouter temporariamente indisponíveis
+```
+
+#### 2. Rate Limiting (HTTP 429)
+```bash
+# Problema: {'error': {'message': 'Provider returned error', 'code': 429}}
+# Solução: Trocar modelo
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324    # Mais estável
+# ou
+OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct:free  # Backup
+```
+
+#### 3. ModuleNotFoundError (ex: langchain_chroma)
+```bash
+# Problema: Dependências em falta no requirements.txt
+# Solução: Verificar se requirements.txt está atualizado
+echo "langchain-chroma>=0.1.0" >> requirements.txt
+docker-compose up -d --build
+```
+
+#### 4. Container não inicia ou trava
+```bash
+# Debug step-by-step
+docker-compose ps                    # Status
+docker-compose logs juridic-bot     # Logs completos
+docker-compose down                 # Parar tudo
+docker-compose up -d --build       # Rebuild forçado
+```
+
+#### 5. Dockerfile context errors
+```bash
+# Problema: "COPY src/ ./src/" failed - "/src": not found
+# Causa: Executando docker-compose do diretório errado
+# Solução: SEMPRE executar do diretório raiz onde está src/
+cd /path/to/SamerPosterga  # Diretório com src/, não deploy/docker/
+docker-compose up -d
+```
+
+#### 6. Variáveis de ambiente não carregam
+```bash
+# Verificar arquivo .env no local correto
+ls -la .env                         # Deve estar no mesmo dir do docker-compose.yml
+cat .env                           # Verificar conteúdo
+docker-compose restart juridic-bot # Reiniciar após mudanças
+```
+
+### Comandos de Debug Úteis
+
+```bash
+# Monitoramento em tempo real
+docker-compose logs juridic-bot -f
+
+# Status completo do container
+docker-compose ps
+docker inspect juridic-concursos-bot
+
+# Verificar variáveis dentro do container
+docker-compose exec juridic-bot env | grep -E "(DISCORD|OPENROUTER|OPENAI)"
+
+# Testar conexão manual
+docker-compose exec juridic-bot python -c "
+from src.juridic_bot.config import Config
+config = Config()
+print(f'Model: {config.openrouter_model}')
+"
+
+# Limpeza completa
+docker-compose down
+docker system prune -f
+docker-compose up -d --build
+```
+
+### Fluxo de Debug Recomendado
+
+1. **Verificar logs**: `docker-compose logs juridic-bot --tail=20`
+2. **Identificar erro**: Rate limiting, ModuleError, ConnectionError
+3. **Aplicar solução**: Trocar modelo, rebuild, verificar .env
+4. **Testar**: Enviar mensagem ao bot e verificar resposta
+5. **Monitorar**: Acompanhar logs em tempo real durante testes
+
+### Modelos OpenRouter Alternativos
+
+Se o modelo atual estiver com problemas:
+
+```bash
+# Modelos gratuitos estáveis (ordem de preferência)
+OPENROUTER_MODEL=deepseek/deepseek-chat-v3-0324        # 1ª opção
+OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct:free # 2ª opção
+OPENROUTER_MODEL=google/gemini-2.0-flash-exp:free      # 3ª opção
+
+# Modelos pagos confiáveis
+OPENROUTER_MODEL=deepseek/deepseek-chat                # ~$0.14/1M
+OPENROUTER_MODEL=qwen/qwen-2.5-7b-instruct            # ~$0.18/1M
+```
