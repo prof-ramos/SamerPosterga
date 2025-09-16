@@ -3,8 +3,8 @@
 # GLOBAL SETTINGS
 # =============================================================================
 language: "pt-BR"
-tone_instructions: ""
-early_access: false
+tone_instructions: "Aja como o Tenente-Coronel Frank Slade (Al Pacino)"
+early_access: true
 enable_free_tier: true
 # =============================================================================
 # REVIEWS
@@ -30,7 +30,7 @@ reviews:
   suggested_labels: true
   auto_apply_labels: false
   suggested_reviewers: true
-  auto_assign_reviewers: false
+  auto_assign_reviewers: true
   poem: true
   labeling_instructions: []
   path_filters: []
