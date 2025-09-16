@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  juridic-bot:
+    image: gabrielramosprof/juridic-bot:latest
+    container_name: juridic-concursos-bot
+    restart: unless-stopped
+    environment:
+      # Discord Configuration (OBRIGATÓRIAS)
+      DISCORD_TOKEN: "seu_discord_token_aqui"
+      DISCORD_GUILD_ID: "seu_guild_id_opcional"
+      DISCORD_OWNER_ID: "seu_user_id_aqui"
+
+      # OpenAI Configuration (OBRIGATÓRIA)
+      OPENAI_API_KEY: "sua_openai_api_key_aqui"
+      EMBEDDING_MODEL: "text-embedding-3-small"
+
+      # OpenRouter Configuration (OBRIGATÓRIA)
+      OPENROUTER_API_KEY: "sua_openrouter_api_key_aqui"
+      OPENROUTER_MODEL: "qwen/qwen3-coder:free"
+
+      # RAG Settings (Opcionais)
+      TOP_K: "5"
+      CHUNK_SIZE: "1500"
+      CHUNK_OVERLAP: "200"
+
+      # System Prompt Personalizado (Opcional)
+      SYSTEM_PROMPT: |
+        Você é um assistente especialista em direito para concursos públicos brasileiros.
+        Responda de forma didática e conversacional, como um professor experiente.
+        Use exemplos práticos e seja claro nas explicações.
+        Foque em direito constitucional, administrativo, penal, civil e processual.
+
+      # Configurações de Logging (Opcionais)
+      LOG_LEVEL: "INFO"
+      PYTHONPATH: "/app/src"
+
+    volumes:
+      # Volume para documentos de conhecimento
+      - knowledge_data:/app/knowledge
+      # Volume para banco vetorial ChromaDB
+      - chroma_data:/app/.chroma
+      # Volume para logs
+      - logs_data:/app/logs
+
+    networks:
+      - juridic-network
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  knowledge_data:
+    driver: local
+  chroma_data:
+    driver: local
+  logs_data:
+    driver: local
+
+networks:
+  juridic-network:
+    driver: bridge
+
+# INSTRUÇÕES DE USO NO PORTAINER:
+#
+# 1. Copie este conteúdo no Portainer > Stacks > Add Stack
+# 2. SUBSTITUA as variáveis obrigatórias:
+#    - DISCORD_TOKEN: Token do bot Discord
+#    - OPENAI_API_KEY: Chave da API OpenAI para embeddings
+#    - OPENROUTER_API_KEY: Chave da API OpenRouter para LLM
+#    - DISCORD_OWNER_ID: Seu user ID do Discord
+#
+# 3. Opcional: Configure DISCORD_GUILD_ID para servidor específico
+# 4. Opcional: Personalize SYSTEM_PROMPT para comportamento específico
+#
+# 5. Deploy da stack
+# 6. Adicione arquivos PDF/TXT na pasta knowledge/ usando Portainer > Volumes
+# 7. O bot indexará automaticamente os documentos na primeira execução
+#
+# COMO USAR O BOT:
+# - Mencione o bot no Discord: @SeuBot qual a diferença entre habeas corpus e habeas data?
+# - Envie DM direta: Oi! Me explica o que é improbidade administrativa?
+# - Comandos admin: /ping, /status, /reindex (apenas owner)
+#
+# MONITORAMENTO:
+# - Logs: Portainer > Containers > juridic-concursos-bot > Logs
+# - Health: Portainer > Containers > juridic-concursos-bot > Stats
+# - Volumes: Portainer > Volumes (knowledge_data, chroma_data, logs_data)
