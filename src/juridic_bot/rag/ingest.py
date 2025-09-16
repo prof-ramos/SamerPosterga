@@ -45,7 +45,11 @@ class DocumentProcessor:
 
         try:
             if ext == '.pdf':
+                # Usar PyPDFLoader com tratamento de erro específico para PDFs problemáticos
                 loader = PyPDFLoader(str(file_path))
+                documents = loader.load()
+                logger.info(f"Carregado: {file_path.name} ({len(documents)} páginas/seções)")
+                return documents
             elif ext == '.txt':
                 loader = TextLoader(str(file_path), encoding='utf-8')
             elif ext == '.md':
@@ -62,6 +66,18 @@ class DocumentProcessor:
 
         except Exception as e:
             logger.error(f"Erro ao carregar {file_path}: {e}")
+            # Para PDFs com problemas de encoding, tentar usar uma abordagem alternativa
+            if ext == '.pdf':
+                logger.warning(f"Tentando abordagem alternativa para PDF problemático: {file_path.name}")
+                try:
+                    # Tentar usar UnstructuredPDFLoader como fallback
+                    from langchain_community.document_loaders import UnstructuredPDFLoader
+                    loader = UnstructuredPDFLoader(str(file_path))
+                    documents = loader.load()
+                    logger.info(f"PDF carregado com abordagem alternativa: {file_path.name} ({len(documents)} páginas)")
+                    return documents
+                except Exception as alt_e:
+                    logger.error(f"Erro também na abordagem alternativa para {file_path}: {alt_e}")
             return []
 
     def enrich_metadata(self, doc: Document, file_path: Path) -> Document:
