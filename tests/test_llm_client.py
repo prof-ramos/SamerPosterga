@@ -19,6 +19,15 @@ class TestLLMClient:
         mock_openai.assert_called_once()
 
     @patch('src.juridic_bot.llm.client.OpenAI')
+    @patch('src.juridic_bot.config.Config.SYSTEM_PROMPT', "Prompt personalizado de teste")
+    def test_llm_client_custom_system_prompt(self, mock_openai):
+        """Testa uso de prompt personalizado via SYSTEM_PROMPT"""
+        client = LLMClient()
+
+        assert client.system_prompt == "Prompt personalizado de teste"
+        mock_openai.assert_called_once()
+
+    @patch('src.juridic_bot.llm.client.OpenAI')
     def test_generate_response_success(self, mock_openai):
         """Testa geração de resposta bem-sucedida"""
         # Mock da resposta da API

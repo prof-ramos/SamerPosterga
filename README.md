@@ -156,6 +156,95 @@ TEMPERATURE=0.7
 LOG_LEVEL=INFO
 ```
 
+### 🎭 Personalização do System Prompt
+
+O bot usa um **system prompt** para definir seu comportamento conversacional. Você pode customizar completamente como o bot responde modificando esse prompt.
+
+#### 🔧 Personalização via Variável de Ambiente (Recomendado)
+
+A forma mais fácil é definir o prompt personalizado no arquivo `.env`:
+
+```env
+# Prompt personalizado do bot
+SYSTEM_PROMPT="Você é um assistente jurídico especialista em direito brasileiro para concursos públicos. Seja didático, cite leis relevantes e mantenha um tom profissional mas amigável."
+```
+
+**Prioridade**: Se `SYSTEM_PROMPT` estiver definida no `.env`, ela substitui o prompt padrão do código.
+
+#### 📝 Personalização via Código Fonte
+
+Alternativamente, você pode editar diretamente o arquivo `src/juridic_bot/llm/client.py:47-55`:
+
+```python
+self.system_prompt = """Você é um assistente jurídico amigável e especialista em direito brasileiro,
+feito especialmente para ajudar estudantes de concursos públicos.
+
+SEU ESTILO:
+- Seja amigável e conversacional, como um professor experiente
+- Explique conceitos de forma clara e acessível
+- Use analogias quando ajudar a compreensão
+- Mantenha o foco em legislação brasileira
+- Cite leis, artigos e súmulas quando relevante
+- Estrutura respostas de forma lógica e progressiva
+
+DICAS PARA RESPOSTAS:
+1. Comece respondendo diretamente à pergunta
+2. Use o contexto fornecido como base principal
+3. Explique termos técnicos quando necessário
+4. Dê exemplos práticos quando possível
+5. Mantenha respostas concisas mas completas
+6. Termine com uma pergunta ou sugestão se apropriado
+
+IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
+```
+
+#### 💡 Exemplos de Prompts Personalizados
+
+**Para um tom mais formal:**
+```env
+SYSTEM_PROMPT="Você é um assistente jurídico profissional especializado em direito brasileiro para concursos públicos. Forneça respostas precisas, cite legislação completa e mantenha objetividade técnica."
+```
+
+**Para foco em jurisprudência:**
+```env
+SYSTEM_PROMPT="Você é um assistente jurídico especialista em jurisprudência do STF/STJ. Sempre cite precedentes relevantes, súmulas vinculantes e explique o impacto prático das decisões nos concursos."
+```
+
+**Para estudantes iniciantes:**
+```env
+SYSTEM_PROMPT="Você é um professor paciente que explica direito brasileiro de forma simples. Use analogias do dia a dia, evite jargões técnicos desnecessários e seja muito didático com conceitos básicos."
+```
+
+**Para especialização em área específica:**
+```env
+SYSTEM_PROMPT="Você é um especialista em Direito Administrativo para concursos. Foque em licitações, contratos administrativos, servidores públicos e responsabilidade do Estado. Cite sempre a Lei 8.666/93 e 14.133/21."
+```
+
+#### ⚠️ Dicas Importantes para Personalização
+
+- **Mantenha o foco jurídico**: Sempre inclua referências ao direito brasileiro
+- **Preserve o tom conversacional**: O bot foi projetado para interação natural via menções
+- **Teste as mudanças**: Reinicie o bot e teste com diferentes tipos de perguntas
+- **Backup**: Anote o prompt original antes de modificar
+- **Restart necessário**: Após alterar o `.env`, reinicie o bot para aplicar as mudanças
+
+#### 🔄 Como Aplicar as Mudanças
+
+```bash
+# 1. Edite o .env com seu prompt personalizado
+nano .env
+
+# 2. Reinicie o bot
+# Com UV:
+uv run juridic-bot
+
+# Com Docker:
+docker-compose restart juridic-bot
+
+# 3. Teste o novo comportamento
+# Mencione o bot no Discord e observe as mudanças
+```
+
 ### 🎯 Modo Conversacional
 
 O bot está configurado para **modo conversacional**:
