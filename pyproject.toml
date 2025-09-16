@@ -30,6 +30,7 @@ dependencies = [
     "langchain>=0.1.0",
     "langchain-community>=0.0.10",
     "langchain-openai>=0.0.5",
+    "langchain-chroma>=0.1.0",
     "pypdf>=3.17.0",
     "python-docx>=1.0.0",
     "tiktoken>=0.5.0",
@@ -40,8 +41,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
+    "pytest",
+    "pytest-asyncio",
     "pytest-cov>=4.0.0",
     "black>=23.0.0",
     "isort>=5.12.0",
@@ -127,7 +128,11 @@ markers = [
     "unit: Unit tests",
     "integration: Integration tests",
     "slow: Slow running tests",
+    "asyncio: Asynchronous tests",
 ]
+
+[tool.pytest_asyncio]
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["src"]
@@ -143,4 +148,9 @@ exclude_lines = [
     "def __repr__",
     "raise AssertionError",
     "raise NotImplementedError",
+]
+
+[dependency-groups]
+dev = [
+    "pytest-asyncio>=1.2.0",
 ]

@@ -39,18 +39,28 @@ cp .env.example .env
 uv run juridic-bot
 ```
 
-### 🐳 Usando Docker
+### 🐳 Usando Docker (Recomendado para MacBook M3)
 
 ```bash
+# Configure suas variáveis de ambiente
+cp .env.example .env
+# Edite o .env com suas chaves API
+
 # Build da imagem usando o Dockerfile otimizado
 docker-compose build
 
-# Execute com docker-compose
+# Execute com docker-compose (recomendado)
 docker-compose up -d
 
-# Ou execute diretamente
-docker run -d --env-file .env juridic-bot
+# Verifique se está rodando
+docker-compose ps
+docker-compose logs -f juridic-bot
+
+# Para parar
+docker-compose down
 ```
+
+**💡 Nota**: O Docker resolve automaticamente o problema do `audioop` em sistemas MacBook M3/ARM64.
 
 ### 🏗️ Build Multi-Arquitetura
 
@@ -352,11 +362,22 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 ### 📊 Status do Projeto
 
 - ✅ **Modo Conversacional**: Ativo e funcional
-- ✅ **RAG System**: ChromaDB + OpenAI embeddings
+- ✅ **RAG System**: ChromaDB + OpenAI embeddings (migrado para langchain-chroma)
 - ✅ **LLM Integration**: OpenRouter (DeepSeek)
 - ✅ **Documentos**: Constituição Federal incluída
-- ✅ **Docker**: Multi-arch support
+- ✅ **Docker**: Multi-arch support (testado e funcionando)
 - ✅ **UV Package Manager**: Configurado
+- ✅ **Tests**: Testes funcionando com pytest-asyncio
+- ✅ **Dependencies**: Atualizadas e funcionais
+
+### 🆕 Atualizações Recentes
+
+**v1.1.0 - Setembro 2025**
+- ✅ **LangChain Chroma Migration**: Migração para `langchain-chroma` (resolve deprecation warnings)
+- ✅ **Docker Otimizado**: Docker funcionando em MacBook M3/ARM64 sem audioop errors
+- ✅ **Pytest Asyncio**: Configuração corrigida para testes assíncronos
+- ✅ **Dependencies**: Dependências atualizadas e funcionais
+- ✅ **Environment Variables**: Simplificação da configuração Docker com `.env`
 
 ### 🎯 Roadmap
 

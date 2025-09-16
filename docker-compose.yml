@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   juridic-bot:
     build:
@@ -7,6 +5,8 @@ services:
       dockerfile: Dockerfile.optimized
     container_name: juridic-concursos-bot
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       - VECTOR_DB_PATH=/data/.chroma
       - KNOWLEDGE_PATH=/data/knowledge
@@ -25,10 +25,6 @@ services:
         reservations:
           memory: 256M
           cpus: '0.25'
-    secrets:
-      - discord_token
-      - openrouter_api_key
-      - openai_api_key
     healthcheck:
       test: ["CMD", "pgrep", "-f", "juridic_bot.main"]
       interval: 30s
@@ -47,11 +43,3 @@ volumes:
     driver: local
   logs:
     driver: local
-
-secrets:
-  discord_token:
-    file: ./secrets/DISCORD_TOKEN
-  openrouter_api_key:
-    file: ./secrets/OPENROUTER_API_KEY
-  openai_api_key:
-    file: ./secrets/OPENAI_API_KEY

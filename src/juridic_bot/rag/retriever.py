@@ -3,7 +3,7 @@ Sistema de recuperação de documentos
 """
 import logging
 from typing import List, Dict, Any
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain.schema import Document
 
 from ..config import Config

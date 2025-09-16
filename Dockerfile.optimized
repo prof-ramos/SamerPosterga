@@ -16,8 +16,9 @@ FROM base AS dependencies
 # Instalar UV para gerenciamento de dependências
 RUN pip install uv
 
-# Copiar arquivos de dependências
+# Copiar arquivos de dependências e código fonte (necessário para build)
 COPY pyproject.toml uv.lock ./
+COPY src/ ./src/
 
 # Instalar dependências usando UV
 RUN uv sync --frozen --no-dev
