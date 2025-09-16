@@ -1,0 +1,49 @@
+/* Tema personalizado para documentação jurídica */
+
+:root {
+  --md-primary-fg-color: #1976d2;
+  --md-accent-fg-color: #1976d2;
+}
+
+/* Destaque para termos jurídicos */
+.juridical-term {
+  background-color: #e3f2fd;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+/* Citações legais */
+.legal-quote {
+  border-left: 4px solid #1976d2;
+  padding-left: 1em;
+  margin: 1em 0;
+  background-color: #f8f9fa;
+  font-style: italic;
+}
+
+/* Avisos personalizados */
+.md-typeset .admonition.juridical {
+  border-color: #1976d2;
+}
+
+.md-typeset .admonition.juridical > .admonition-title {
+  background-color: rgba(25, 118, 210, 0.1);
+  border-color: #1976d2;
+}
+
+.md-typeset .admonition.juridical > .admonition-title::before {
+  background-color: #1976d2;
+  mask-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>');
+}
+
+/* Responsividade para dispositivos móveis */
+@media screen and (max-width: 768px) {
+  .md-nav--primary .md-nav__title {
+    background-color: var(--md-primary-fg-color);
+  }
+
+  .md-typeset table {
+    font-size: 0.8em;
+  }
+}
