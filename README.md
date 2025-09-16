@@ -16,10 +16,17 @@ Assistente jurídico inteligente e amigável para estudantes de concursos públi
 
 ### Pré-requisitos
 
-- Python 3.11+
-- Discord Bot Token
-- OpenRouter API Key
-- OpenAI API Key
+**🐍 Python:**
+- Python 3.11+ ([Download](https://www.python.org/downloads/))
+- ⚠️ **Windows**: Marque "Add Python to PATH" durante a instalação
+
+**🔑 API Keys:**
+- Discord Bot Token ([Discord Developer Portal](https://discord.com/developers/applications))
+- OpenRouter API Key ([OpenRouter](https://openrouter.ai/))
+- OpenAI API Key ([OpenAI](https://platform.openai.com/api-keys))
+
+**🐳 Docker (Opcional, mas recomendado):**
+- Docker Desktop ([Download](https://www.docker.com/products/docker-desktop/))
 
 ### 🚀 Instalação Rápida com UV
 
@@ -79,6 +86,34 @@ Para deploy em ambiente de produção usando Portainer:
 1. Crie os secrets necessários no Portainer
 2. Faça upload do arquivo `deploy/portainer-stack.yml` como uma nova stack
 3. Deploy da stack através da interface do Portainer
+
+### 💻 Windows (Setup Automático)
+
+**Opção 1: Command Prompt (.bat)**
+```cmd
+# Clone o repositório
+git clone https://github.com/prof-ramos/SamerPosterga.git
+cd SamerPosterga
+
+# Execute o setup automático
+setup.bat
+```
+
+**Opção 2: PowerShell (.ps1)**
+```powershell
+# Clone o repositório
+git clone https://github.com/prof-ramos/SamerPosterga.git
+cd SamerPosterga
+
+# Execute o setup com PowerShell
+.\setup.ps1
+
+# Opções avançadas:
+.\setup.ps1 -DevMode          # Instala deps de desenvolvimento
+.\setup.ps1 -UseDocker        # Configura apenas para Docker
+```
+
+📖 **Problemas no Windows?** Consulte o [Guia Completo para Windows](WINDOWS.md)
 
 ### 📦 Instalação Tradicional (pip)
 
@@ -257,6 +292,7 @@ O HC é específico para liberdade, enquanto o MS vale para outros direitos. Amb
 
 ### 🛠️ Configuração com UV (Recomendado)
 
+**Linux/macOS:**
 ```bash
 # Instale dependências incluindo dev
 uv sync --dev
@@ -271,6 +307,17 @@ uv run black src/
 uv run isort src/
 
 # Execute o bot em modo desenvolvimento
+uv run juridic-bot
+```
+
+**Windows:**
+```powershell
+# Use o setup automático com modo desenvolvimento
+.\setup.ps1 -DevMode
+
+# Ou manualmente:
+uv sync --dev
+uv run pytest
 uv run juridic-bot
 ```
 
