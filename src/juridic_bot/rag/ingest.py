@@ -226,3 +226,13 @@ class DocumentProcessor:
         logger.info(f"Vectorstore criado/atualizado com {len(documents)} chunks")
 
         return vectorstore
+
+
+def main() -> None:
+    """CLI para reindexação da base RAG."""
+    processor = DocumentProcessor()
+    processor.create_vectorstore()
+
+
+if __name__ == "__main__":
+    main()

@@ -8,13 +8,9 @@ services:
     env_file:
       - .env
     environment:
-      - VECTOR_DB_PATH=/data/.chroma
-      - KNOWLEDGE_PATH=/data/knowledge
+      - VECTOR_DB_PATH=/app/.chroma
+      - KNOWLEDGE_PATH=/app/knowledge
       - LOG_LEVEL=INFO
-    volumes:
-      - ./knowledge:/data/knowledge:rw
-      - ./.chroma:/data/.chroma:rw
-      - ./logs:/data/logs:rw
     networks:
       - juridic-network
     deploy:
@@ -36,10 +32,3 @@ networks:
   juridic-network:
     driver: bridge
 
-volumes:
-  knowledge:
-    driver: local
-  chroma:
-    driver: local
-  logs:
-    driver: local

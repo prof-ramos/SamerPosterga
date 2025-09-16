@@ -35,14 +35,6 @@ services:
       LOG_LEVEL: "INFO"
       PYTHONPATH: "/app/src"
 
-    volumes:
-      # Volume para documentos de conhecimento
-      - knowledge_data:/app/knowledge
-      # Volume para banco vetorial ChromaDB
-      - chroma_data:/app/.chroma
-      # Volume para logs
-      - logs_data:/app/logs
-
     networks:
       - juridic-network
 
@@ -53,13 +45,7 @@ services:
       retries: 3
       start_period: 40s
 
-volumes:
-  knowledge_data:
-    driver: local
-  chroma_data:
-    driver: local
-  logs_data:
-    driver: local
+
 
 networks:
   juridic-network:

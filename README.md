@@ -106,16 +106,13 @@ O bot indexa automaticamente na primeira execução.
 
 ### Imagem Oficial
 
-```bash
 # Executar imagem do DockerHub
 docker run -d \
   --name juridic-bot \
   -e DISCORD_TOKEN=seu_token \
   -e OPENAI_API_KEY=sua_key \
   -e OPENROUTER_API_KEY=sua_key \
-  -v $(pwd)/knowledge:/app/knowledge \
-  gabrielramosprof/juridic-bot:latest
-```
+gabrielramosprof/juridic-bot:latest
 
 ### Build Local
 

@@ -27,22 +27,9 @@ Este diretório contém os arquivos necessários para deploy do Juridic Bot no P
 
 ### 3. Adicionar Documentos
 
-1. Acesse Volumes → `knowledge_data`
-2. Adicione PDFs/TXT jurídicos organizados por área
-3. O bot indexará automaticamente na primeira execução
+Os documentos agora são incluídos diretamente na imagem do Docker. Para atualizar a base de conhecimento, é necessário reconstruir a imagem.
 
-## Estrutura de Volumes
 
-```
-knowledge_data/     # Documentos jurídicos
-├── direito_constitucional/
-├── direito_administrativo/
-├── direito_penal/
-└── direito_civil/
-
-chroma_data/        # Banco vetorial (auto-gerenciado)
-logs_data/          # Logs do sistema
-```
 
 ## Monitoramento
 

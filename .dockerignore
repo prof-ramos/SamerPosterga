@@ -55,22 +55,5 @@ Thumbs.db
 data/
 *.db
 *.sqlite
-chroma/
-logs/
 knowledge/backup/
 *.tmp
-
-# Documentation
-README.md
-docs/
-*.md
-
-# Docker
-Dockerfile
-docker-compose.yml
-.dockerignore
-
-# Tests
-tests/
-.pytest_cache/
-.coverage

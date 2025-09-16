@@ -52,7 +52,8 @@ dev = [
 ]
 
 [project.scripts]
-juridic-bot = "src.juridic_bot.main:main"
+juridic-bot = "juridic_bot.main:run"
+rag-reindex = "juridic_bot.rag.ingest:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

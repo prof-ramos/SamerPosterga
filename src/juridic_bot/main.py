@@ -34,5 +34,10 @@ async def main():
         await bot.close()
 
 
-if __name__ == "__main__":
+def run() -> None:
+    """CLI entrypoint that runs the asynchronous bot startup."""
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run()
