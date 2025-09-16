@@ -22,12 +22,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 COPY pyproject.toml .
 
-# Copy knowledge base and embeddings
-COPY knowledge/ ./knowledge/
-COPY .chroma/ ./.chroma/
+# Create necessary directories
+RUN mkdir -p knowledge .chroma logs
 
 # Create non-root user for security
-RUN mkdir -p logs && useradd --create-home --shell /bin/bash app     && chown -R app:app /app
+RUN useradd --create-home --shell /bin/bash app \
+    && chown -R app:app /app
 USER app
 
 # Health check
