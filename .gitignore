@@ -186,3 +186,5 @@ ehthumbs.db
 # Documentation build
 site/
 docs/_build/
+# Knowledge base
+/Users/gabrielramos/SamerPosterga/knowledge/
