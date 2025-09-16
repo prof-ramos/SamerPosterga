@@ -21,7 +21,12 @@ class LLMClient:
         self.model = Config.OPENROUTER_MODEL
 
         # System prompt conversacional para estudantes de concursos jurídicos
-        self.system_prompt = """Você é um assistente jurídico amigável e especialista em direito brasileiro,
+        # Usar prompt personalizado se definido, senão usar o padrão
+        if Config.SYSTEM_PROMPT:
+            self.system_prompt = Config.SYSTEM_PROMPT
+            logger.info("Usando prompt personalizado definido em SYSTEM_PROMPT")
+        else:
+            self.system_prompt = """Você é um assistente jurídico amigável e especialista em direito brasileiro,
 feito especialmente para ajudar estudantes de concursos públicos.
 
 SEU ESTILO:
@@ -73,7 +78,7 @@ IMPORTANTE: Nunca mencione que é uma IA ou dê disclaimers legais."""
             )
 
             # Log de uso
-            if hasattr(response, 'usage'):
+            if hasattr(response, 'usage') and response.usage:
                 logger.info(f"Tokens usados: {response.usage.total_tokens}")
 
             # Garantir encoding UTF-8 correto

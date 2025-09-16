@@ -41,7 +41,7 @@ class Config:
     MAX_TOKENS = int(os.getenv("MAX_TOKENS", "2000"))
     TEMPERATURE = float(os.getenv("TEMPERATURE", "0.7"))
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-
+    SYSTEM_PROMPT: str | None = os.getenv("SYSTEM_PROMPT")  # Prompt personalizado opcional
     @classmethod
     def validate(cls):
         """Valida configurações essenciais"""
